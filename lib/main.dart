@@ -4,6 +4,7 @@ import 'package:pawskills/pages/login/Long_page.dart';
 import 'package:pawskills/pages/login/Register_page.dart';
 import 'package:pawskills/pages/login/Register_pet.dart';
 import 'package:pawskills/pages/login/rootpage.dart';
+import 'package:pawskills/pages/main/skip.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() {
         '/register': (context) => Register(),
         '/RegPet': (context) => RegPet(),
         '/longin': (context) => UserLogin(),
+        '/skip': (context) => Skip(),
       },
     ),
   );

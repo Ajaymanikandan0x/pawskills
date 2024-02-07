@@ -88,7 +88,7 @@ class _RegPetState extends State<RegPet> {
                 button(
                     text: 'Next >',
                     //add pet scrolling screen rout name
-                    routeName: '',
+                    routeName: '/skip',
                     context: context,
                     width: 400,
                     height: 65)
