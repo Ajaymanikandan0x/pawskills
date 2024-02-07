@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
 
+// ________________________________button_________________________________________
 Widget button(
-        {required String text, required String routeName, required context}) =>
+        {required String text,
+        required String routeName,
+        required context,
+        double width = 250,
+        double height = 50}) =>
     InkWell(
       onTap: () {
         Navigator.pushNamed(context, routeName);
       },
       child: Container(
-        width: 250, // Adjust width as needed
-        height: 50, // Adjust height as needed
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(30)),
+        width: width, // Adjust width as needed
+        height: height, // Adjust height as needed
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(30)),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
               Colors.lightBlueAccent,
-              Colors.blue,
+              Colors.blue.shade800,
             ],
-            stops: [0.2, 0.5],
+            stops: [0.2, 0.4],
           ),
         ),
         child: Center(

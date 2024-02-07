@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pawskills/functions/Button.dart';
+
+import 'functions/Functions.dart';
 
 class Root extends StatelessWidget {
   const Root({super.key});
@@ -21,11 +22,11 @@ class Root extends StatelessWidget {
             const SizedBox(
               height: 50,
             ),
-            button(text: 'Sing in'),
+            button(text: 'Sing in', context: context, routeName: '/register'),
             const SizedBox(
               height: 20,
             ),
-            button(text: 'Long in'),
+            button(text: 'Long in', routeName: "/register", context: context),
           ],
         ),
       ),
