@@ -3,14 +3,11 @@ import 'package:flutter/material.dart';
 // ________________________________button_________________________________________
 Widget button(
         {required String text,
-        required String routeName,
-        required context,
         double width = 250,
-        double height = 50}) =>
+        double height = 50,
+        required void Function() ontap}) =>
     InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, routeName);
-      },
+      onTap: ontap,
       child: Container(
         width: width, // Adjust width as needed
         height: height, // Adjust height as needed

@@ -45,7 +45,7 @@ class _RegPetState extends State<RegPet> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Let’s complete pet profile',
+                  'Complete your pet details with us',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 23),
                 ),
                 const SizedBox(height: 10),
@@ -88,8 +88,7 @@ class _RegPetState extends State<RegPet> {
                 button(
                     text: 'Next >',
                     //add pet scrolling screen rout name
-                    routeName: '/skip',
-                    context: context,
+                    ontap: () {},
                     width: 400,
                     height: 65)
               ],
