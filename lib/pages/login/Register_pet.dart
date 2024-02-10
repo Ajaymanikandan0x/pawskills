@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'functions/Functions.dart';
 import 'functions/formfield.dart';
@@ -12,6 +13,9 @@ class RegPet extends StatefulWidget {
 class _RegPetState extends State<RegPet> {
   String dropdownTitle = '  Choose Gender';
   String? selectedGender;
+  final ageController = TextEditingController();
+  final weightController = TextEditingController();
+  final heightController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -73,22 +77,31 @@ class _RegPetState extends State<RegPet> {
                   ),
                 ),
                 form_field(
-                    Hint_text: 'Age', inputIcon: const Icon(Icons.timelapse)),
+                    Hint_text: 'Age',
+                    inputIcon: const Icon(Icons.timelapse),
+                    controller: ageController),
                 const SizedBox(height: 10),
                 pet_bmi(
                     Hint_text: 'Weight',
                     inputIcon: const Icon(Icons.monitor_weight_outlined),
+                    controller: heightController,
                     hi_wi: 'KG'),
                 const SizedBox(height: 10),
                 pet_bmi(
                     Hint_text: 'Height',
                     inputIcon: const Icon(Icons.height),
+                    controller: weightController,
                     hi_wi: 'CM'),
                 const SizedBox(height: 20),
                 button(
                     text: 'Next >',
                     //add pet scrolling screen rout name
-                    ontap: () {},
+                    ontap: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/skip', (route) => false);
+                    },
+                    //production  simplicity
+                    // _savePetInfo,
                     width: 400,
                     height: 65)
               ],
@@ -97,5 +110,21 @@ class _RegPetState extends State<RegPet> {
         ),
       ),
     );
+  }
+
+  void _savePetInfo() {
+    // Access Firestore collection and add data
+    FirebaseFirestore.instance.collection('petbasicinfo').add({
+      'gender': selectedGender,
+      'age': ageController.text,
+      'weight': weightController.text,
+      'height': heightController.text,
+    }).then((_) {
+      // If data is successfully added, navigate to next screen
+      Navigator.pushNamedAndRemoveUntil(context, '/skip', (route) => false);
+    }).catchError((e) {
+      // Handle errors if any
+      print('Error saving pet info: $e');
+    });
   }
 }

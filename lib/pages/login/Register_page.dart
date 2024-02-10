@@ -163,7 +163,7 @@ class Register extends StatelessWidget {
         final String password = passwordController.text;
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
-        Navigator.pushReplacementNamed(context, '/RegPet');
+        Navigator.pushReplacementNamed(context, '/longin');
       } catch (e) {
         print('Error to add Email and password $e ');
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 Widget form_field(
-        {required String Hint_text,
-        required Icon inputIcon,
+        {String? Hint_text,
+        Icon? inputIcon,
         bool password = false,
         TextEditingController? controller,
         String? Function(String?)? validate}) =>

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pawskills/pages/admin/category.dart';
 import 'package:pawskills/pages/login/Long_page.dart';
 import 'package:pawskills/pages/login/Register_page.dart';
 import 'package:pawskills/pages/login/Register_pet.dart';
@@ -22,12 +23,13 @@ void main() async {
           textTheme: GoogleFonts.poppinsTextTheme(),
           scaffoldBackgroundColor: Colors.grey[200]),
       routes: {
-        '/': (context) => Root(),
+        '/': (context) => const Root(),
         '/register': (context) => Register(),
-        '/RegPet': (context) => RegPet(),
+        '/RegPet': (context) => const RegPet(),
         '/longin': (context) => UserLogin(),
-        '/skip': (context) => Skip(),
-        '/home': (context) => Home(),
+        '/skip': (context) => const Skip(),
+        '/home': (context) => const Home(),
+        '/category': (context) => Category(),
       },
     ),
   );

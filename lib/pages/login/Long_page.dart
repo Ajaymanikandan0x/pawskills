@@ -75,7 +75,9 @@ class UserLogin extends StatelessWidget {
               button(
                   text: 'Login',
                   ontap: () async {
-                    await _login(context);
+                    //comment rout after
+                    Navigator.pushReplacementNamed(context, '/RegPet');
+                    // await _login(context);
                   },
                   width: 330),
               const SizedBox(height: 30),
@@ -129,7 +131,7 @@ class UserLogin extends StatelessWidget {
       );
 
       // Navigate to the home page  upon successful login
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/RegPet');
     } catch (e) {
       // Handle any login errors
       if (kDebugMode) {

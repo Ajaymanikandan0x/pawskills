@@ -46,7 +46,7 @@ class Root extends StatelessWidget {
                   InkWell(
                     //redirect to register page
                     onTap: () {
-                      Navigator.pushNamed(context, '/home');
+                      Navigator.pushNamed(context, '/skip');
                     },
                     child: const Text(
                       'Register',

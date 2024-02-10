@@ -58,7 +58,12 @@ class Skip extends StatelessWidget {
                   )),
             ),
             //goto home page
-            button(text: 'Skip', ontap: () {}, width: 350)
+            button(
+                text: 'Skip',
+                ontap: () {
+                  Navigator.pushNamed(context, '/home');
+                },
+                width: 350)
           ]),
         ),
       ),

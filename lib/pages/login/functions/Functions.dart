@@ -20,7 +20,7 @@ Widget button(
               Colors.lightBlueAccent,
               Colors.blue.shade800,
             ],
-            stops: [0.2, 0.4],
+            stops: const [0.2, 0.4],
           ),
         ),
         child: Center(
