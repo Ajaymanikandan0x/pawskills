@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:pawskills/pages/main/functions/mainFunctios.dart';
+import 'package:pawskills/pages/admin/adminFunctions/petImg.dart';
+import '../user/functions/mainFunctios.dart';
+import 'adminFunctions/adminFunction.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,19 +30,9 @@ class Home extends StatelessWidget {
           padding: EdgeInsets.only(top: 20, left: 10, right: 10),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  category(
-                      text: 'Cats',
-                      ontap: () {
-                        Navigator.pushNamed(context, '/category');
-                      }),
-                  category(text: 'Dogs'),
-                  category(text: 'Others'),
-                  category(text: 'Add')
-                ],
-              )
+              Flexible(child: categoryList(context)),
+              SizedBox(height: 40),
+              Expanded(child: petListView()),
             ],
           )),
     );

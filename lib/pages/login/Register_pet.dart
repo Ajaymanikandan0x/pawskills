@@ -16,19 +16,10 @@ class _RegPetState extends State<RegPet> {
   final ageController = TextEditingController();
   final weightController = TextEditingController();
   final heightController = TextEditingController();
+  final energyLevelController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    List<DropdownMenuItem<String>> list = [
-      const DropdownMenuItem(
-        value: 'Male',
-        child: Text('Male'),
-      ),
-      const DropdownMenuItem(
-        value: 'Female',
-        child: Text('Female'),
-      ),
-    ];
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -61,21 +52,10 @@ class _RegPetState extends State<RegPet> {
                       color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 25),
-                ListTile(
-                  leading: const Icon(Icons.pets),
-                  title: Text(dropdownTitle), // Provide the label here
-                  trailing: DropdownButton<String>(
-                    value: selectedGender, // Initial value for DropdownButton
-                    items: list,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedGender = value; // Update the selectedGender
-                        // Update the title based on the selected value
-                        dropdownTitle = value ?? 'Please Select';
-                      });
-                    },
-                  ),
-                ),
+                form_field(
+                    Hint_text: 'Energy Level',
+                    inputIcon: const Icon(Icons.upgrade_outlined),
+                    controller: energyLevelController),
                 form_field(
                     Hint_text: 'Age',
                     inputIcon: const Icon(Icons.timelapse),

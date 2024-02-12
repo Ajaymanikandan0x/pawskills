@@ -12,11 +12,12 @@ class Category extends StatefulWidget {
 
 class _CategoryState extends State<Category> {
   List<TextEditingController> controllers = [];
+  List<String> categoryNames = [];
 
   @override
   void initState() {
     super.initState();
-    controllers.add(TextEditingController()); // Add initial controller
+    _fetchCategories(); // Add initial controller
   }
 
   @override
@@ -86,6 +87,25 @@ class _CategoryState extends State<Category> {
     setState(() {
       controllers.removeAt(index);
     });
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      final QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('categories').get();
+      setState(() {
+        categoryNames = querySnapshot.docs
+            .map((doc) => doc['categoryName'] as String)
+            .toList();
+
+        // Initialize controllers and assign fetched data to each controller
+        controllers = categoryNames
+            .map((categoryName) => TextEditingController(text: categoryName))
+            .toList();
+      });
+    } catch (error) {
+      print('Error fetching categories: $error');
+    }
   }
 
   void _saveToFirebase() async {
