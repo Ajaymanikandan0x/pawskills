@@ -31,9 +31,9 @@ void main() async {
         '/longin': (context) => UserLogin(),
         '/skip': (context) => const Skip(),
         '/home': (context) => const Home(),
-        '/category': (context) => Category(),
-        '/adminprof': (context) => Adminprof(),
-        '/addnewpet': (context) => AddNewPet()
+        '/category': (context) => const Category(),
+        '/adminprof': (context) => const AdminProf(),
+        '/addnewpet': (context) => const AddNewPet()
       },
     ),
   );

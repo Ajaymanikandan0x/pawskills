@@ -185,7 +185,7 @@ class _AddBewPetState extends State<AddNewPet> {
     final petData = {
       'petName': petNameController.text,
       'petDetails': petDetailsController.text,
-      'temperament': temperamentController.text,
+      'Life_Expectancy': temperamentController.text,
       'weight': weightController.text,
       'height': heightController.text,
       'energyLevel': energyLevelController.text,

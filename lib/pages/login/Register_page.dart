@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -161,8 +162,18 @@ class Register extends StatelessWidget {
       try {
         final String email = emailController.text.trim();
         final String password = passwordController.text;
-        await FirebaseAuth.instance
+        final String firstName = firstname.text.trim();
+        final String lastName = lastname.text.trim();
+        //create the user in fire base
+        final UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
+        final User user = userCredential.user!;
+        // save user details in firestore
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'email': email,
+        });
         Navigator.pushReplacementNamed(context, '/longin');
       } catch (e) {
         print('Error to add Email and password $e ');

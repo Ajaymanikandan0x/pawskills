@@ -27,14 +27,25 @@ class _HomeState extends State<Home> {
                 child: bell())
           ]),
       body: Padding(
-          padding: EdgeInsets.only(top: 20, left: 10, right: 10),
+          padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
           child: Column(
             children: [
-              Flexible(child: categoryList(context)),
-              SizedBox(height: 40),
+              categoryList(context),
+              const SizedBox(height: 40),
               Expanded(child: petListView()),
             ],
           )),
+      bottomNavigationBar: customNavBar(
+        icons: [Icons.home, Icons.person],
+        currentIndex: 0,
+        onTap: (int index) {
+          if (index == 0) {
+            Navigator.pushNamed(context, '/home');
+          } else if (index == 1) {
+            Navigator.pushNamed(context, '/adminprof');
+          }
+        },
+      ),
     );
   }
 }

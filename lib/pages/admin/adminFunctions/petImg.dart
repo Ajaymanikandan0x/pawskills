@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import 'adminFunction.dart';
 
 // ____________________________imgadd_______________________________________
 Widget petImg({
@@ -39,7 +36,7 @@ Widget petImg({
                 child: Center(
                   child: Text(
                     text,
-                    style: TextStyle(color: Colors.grey),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ), // Placeholder icon
               ),
@@ -99,26 +96,22 @@ Widget petListView() => StreamBuilder<QuerySnapshot>(
 
         final List<DocumentSnapshot> documents = snapshot.data!.docs;
 
-        return SizedBox(
-          height: 40,
-          child: ListView.separated(
-            itemCount: documents.length,
-            itemBuilder: (context, index) {
-              final category = documents[index].data() as Map<String, dynamic>;
-              final img = category['listPhoto'];
-              final petname = category['petName'];
-              final energyLevel = category['energyLevel'];
-              final petdetails = category['petDetails'];
-              return petCard(
-                  imgBase64: img,
-                  petname: petname,
-                  energyLevel: energyLevel,
-                  petdetails: petdetails);
-            },
-            separatorBuilder: (BuildContext context, int index) =>
-                const SizedBox(
-              width: 8.0,
-            ),
+        return ListView.separated(
+          itemCount: documents.length,
+          itemBuilder: (context, index) {
+            final category = documents[index].data() as Map<String, dynamic>;
+            final img = category['listPhoto'];
+            final petname = category['petName'];
+            final energyLevel = category['energyLevel'];
+            final petdetails = category['petDetails'];
+            return petCard(
+                imgBase64: img,
+                petname: petname,
+                energyLevel: energyLevel,
+                petdetails: petdetails);
+          },
+          separatorBuilder: (BuildContext context, int index) => const SizedBox(
+            width: 8.0,
           ),
         );
       },
@@ -151,9 +144,9 @@ Widget petCard({
           width: 100,
           child: img != null
               ? Image.memory(img, fit: BoxFit.cover)
-              : Placeholder(),
+              : const Placeholder(),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -163,21 +156,22 @@ Widget petCard({
               children: [
                 Text(
                   petname,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w600),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   energyLevel,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Flexible(
                   fit: FlexFit.loose,
                   child: SingleChildScrollView(
                     child: Text(
                       maxLines: 2,
                       petdetails,
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),
@@ -199,7 +193,7 @@ Widget petCard({
                 ),
               ],
             ),
-            child: Icon(Icons.edit)),
+            child: const Icon(Icons.edit)),
       ],
     ),
   );

@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -72,23 +69,23 @@ Widget addnew(
 
 Widget homePageCategory({required String text, void Function()? ontap}) =>
     InkWell(
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(25),
       onTap: ontap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(50),
+          borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 4,
               blurRadius: 5,
               offset: const Offset(0, 3), // changes position of shadow
             ),
           ],
         ),
-        height: 35,
-        width: 90,
+        height: 40,
+        width: text.length * 20.0,
         child: Center(
             child: Text(
           text,
@@ -102,40 +99,49 @@ Widget homePageCategory({required String text, void Function()? ontap}) =>
 
 // ______________________category_list_view_____________________________________
 
-Widget categoryList(BuildContext context) => StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('categories').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+Widget categoryList(BuildContext context) => Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: 40,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('categories')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
 
-        final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                final List<DocumentSnapshot> documents = snapshot.data!.docs;
 
-        return SizedBox(
-          height: 40,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: documents.length,
-            itemBuilder: (context, index) {
-              final category = documents[index].data() as Map<String, dynamic>;
-              final categoryName = category['categoryName'];
-              return homePageCategory(
-                  text: '$categoryName',
-                  ontap: () {
-                    _navigateToCategory(context, categoryName);
-                  });
-            },
-            separatorBuilder: (BuildContext context, int index) =>
-                const SizedBox(
-              width: 8.0,
+                return ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: documents.length,
+                  itemBuilder: (context, index) {
+                    final category =
+                        documents[index].data() as Map<String, dynamic>;
+                    final categoryName = category['categoryName'];
+                    return homePageCategory(
+                        text: '$categoryName',
+                        ontap: () {
+                          _navigateToCategory(context, categoryName);
+                        });
+                  },
+                  separatorBuilder: (BuildContext context, int index) =>
+                      const SizedBox(
+                    width: 8.0,
+                  ),
+                );
+              },
             ),
           ),
-        );
-      },
+        ),
+      ],
     );
 
 void _navigateToCategory(BuildContext context, String categoryName) {
@@ -143,11 +149,11 @@ void _navigateToCategory(BuildContext context, String categoryName) {
     case 'Edit':
       Navigator.pushNamed(context, '/category');
       break;
-    case 'Add':
+    case 'Add-Pet':
       Navigator.pushNamed(context, '/addnewpet');
       break;
     case 'Dog':
-      Navigator.pushNamed(context, '/category');
+    // Navigator.pushNamed(context, '/category');
     // Add more cases for additional category names and corresponding routes
     default:
       // If the category name doesn't match any predefined routes, you can handle it here
