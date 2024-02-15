@@ -56,6 +56,7 @@ class _RegPetState extends State<RegPet> {
                     Hint_text: 'Energy Level',
                     inputIcon: const Icon(Icons.upgrade_outlined),
                     controller: energyLevelController),
+                const SizedBox(height: 10),
                 form_field(
                     Hint_text: 'Age',
                     inputIcon: const Icon(Icons.timelapse),
@@ -76,12 +77,13 @@ class _RegPetState extends State<RegPet> {
                 button(
                     text: 'Next >',
                     //add pet scrolling screen rout name
-                    ontap: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/skip', (route) => false);
-                    },
-                    //production  simplicity
-                    // _savePetInfo,
+                    ontap:
+                        //     () {
+                        //   Navigator.pushNamedAndRemoveUntil(
+                        //       context, '/skip', (route) => false);
+                        // },
+                        //production  simplicity
+                        _savePetInfo,
                     width: 400,
                     height: 65)
               ],

@@ -5,8 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:pawskills/pages/admin/adminFunctions/petImg.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
+import 'admin_functions/petImg.dart';
 
 class AdminProf extends StatefulWidget {
   const AdminProf({super.key});
@@ -73,20 +73,19 @@ class _AdminProfState extends State<AdminProf> {
             const SizedBox(height: 25),
             _text('First Name'),
             const SizedBox(height: 10),
-            nameField(
-                controller: firstNameController, Hint_text: ' First name'),
+            nameField(controller: firstNameController, hintText: ' First name'),
             const SizedBox(height: 20),
             _text('Last Name'),
             const SizedBox(height: 20),
             nameField(
-              Hint_text: 'Last name',
+              hintText: 'Last name',
               controller: lastNameController,
             ),
             const SizedBox(height: 20),
             _text('Email Address'),
             const SizedBox(height: 10),
             nameField(
-              Hint_text: 'Email',
+              hintText: 'Email',
               controller: emailController,
             ),
             const SizedBox(height: 80),

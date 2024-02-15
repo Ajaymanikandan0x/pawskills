@@ -2,25 +2,24 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:pawskills/pages/admin/adminFunctions/petImg.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
 import 'package:pawskills/pages/login/functions/formfield.dart';
+import '../admin/admin_functions/petImg.dart';
 
-import 'adminFunctions/adminFunction.dart';
-
-class AddNewPet extends StatefulWidget {
-  const AddNewPet({super.key});
+class UserPet extends StatefulWidget {
+  const UserPet({super.key});
 
   @override
-  State<AddNewPet> createState() => _AddBewPetState();
+  State<UserPet> createState() => _UserPetState();
 }
 
-class _AddBewPetState extends State<AddNewPet> {
+class _UserPetState extends State<UserPet> {
   final petNameController = TextEditingController();
   final petDetailsController = TextEditingController();
-  final temperamentController = TextEditingController();
+  final genderController = TextEditingController();
   final weightController = TextEditingController();
   final heightController = TextEditingController();
   final energyLevelController = TextEditingController();
@@ -72,7 +71,7 @@ class _AddBewPetState extends State<AddNewPet> {
                 ),
                 const SizedBox(height: 7),
                 nameField(
-                  Hint_text: 'Pet name',
+                  hintText: 'Pet name',
                   controller: petNameController,
                 ),
                 const SizedBox(height: 15),
@@ -83,7 +82,7 @@ class _AddBewPetState extends State<AddNewPet> {
                 nameField(
                     maxLines: null,
                     controller: petDetailsController,
-                    Hint_text: 'Details'),
+                    hintText: 'Details'),
                 const SizedBox(height: 15),
                 _text(
                   'Complete Profile',
@@ -95,9 +94,9 @@ class _AddBewPetState extends State<AddNewPet> {
                     inputIcon: const Icon(Icons.upgrade_outlined)),
                 const SizedBox(height: 10),
                 form_field(
-                    Hint_text: 'Life Expectancy',
+                    Hint_text: 'Gender',
                     inputIcon: const Icon(Icons.timelapse),
-                    controller: temperamentController),
+                    controller: genderController),
                 const SizedBox(height: 10),
                 pet_bmi(
                     Hint_text: 'AVG Weight',
@@ -120,17 +119,6 @@ class _AddBewPetState extends State<AddNewPet> {
               ],
             ),
           )),
-      bottomNavigationBar: customNavBar(
-        icons: [Icons.home, Icons.person],
-        currentIndex: 0,
-        onTap: (int index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, '/home');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, '/adminprof');
-          }
-        },
-      ),
     );
   }
 
@@ -177,15 +165,21 @@ class _AddBewPetState extends State<AddNewPet> {
   // ____________________________save_Firebase__________________________________
 
   Future<void> _uploadPetDetailsToFirebase() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      print('User is not authenticated.');
+      return;
+    }
+
     final databaseRef = FirebaseFirestore.instance;
-    final dogCollectionRef = databaseRef.collection('categories').doc('Dog');
-    final petsCollectionRef = dogCollectionRef.collection('List');
+    final userPetsCollectionRef =
+        databaseRef.collection('user_pets').doc(user.uid).collection('pets');
 
     // Store data in a Map
     final petData = {
       'petName': petNameController.text,
       'petDetails': petDetailsController.text,
-      'Life_Expectancy': temperamentController.text,
+      'gender': genderController.text,
       'weight': weightController.text,
       'height': heightController.text,
       'energyLevel': energyLevelController.text,
@@ -194,8 +188,8 @@ class _AddBewPetState extends State<AddNewPet> {
     };
 
     try {
-      // Use doc method to create a new document with custom ID (pet name)
-      await petsCollectionRef.doc(petNameController.text).set(petData);
+      // Use add method to automatically generate a unique document ID
+      await userPetsCollectionRef.add(petData);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -206,7 +200,7 @@ class _AddBewPetState extends State<AddNewPet> {
       // Clear form fields
       petNameController.clear();
       petDetailsController.clear();
-      temperamentController.clear();
+      genderController.clear();
       weightController.clear();
       heightController.clear();
       energyLevelController.clear();

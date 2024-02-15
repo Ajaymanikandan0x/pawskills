@@ -54,8 +54,8 @@ Widget pet_bmi(
             borderRadius: const BorderRadius.all(Radius.circular(15)),
             color: Colors.purple[800],
           ),
-          height: 56,
-          width: 58,
+          height: 50,
+          width: 50,
           child: Center(
             child: Text(
               hi_wi,

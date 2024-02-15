@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
-import 'adminFunctions/adminFunction.dart';
+import 'admin_functions/admin_function.dart';
 
 class Category extends StatefulWidget {
   const Category({Key? key}) : super(key: key);
@@ -57,7 +57,7 @@ class _CategoryState extends State<Category> {
           ),
         ),
         bottomSheet: Padding(
-            padding: const EdgeInsets.all(15.0),
+            padding: const EdgeInsets.only(bottom: 15),
             child: button(
                 text: 'Save Categories', ontap: _saveToFirebase, width: 350)));
   }
@@ -72,21 +72,28 @@ class _CategoryState extends State<Category> {
     if (index < controllers.length) {
       String documentId = controllers[index].text;
       if (documentId.isNotEmpty) {
+        print('Attempting to delete document with ID: $documentId');
+
         try {
           await FirebaseFirestore.instance
               .collection('categories')
               .doc(documentId)
               .delete();
-          print('Document deleted from Firestore successfully!');
-        } catch (error) {
-          print('Error deleting document from Firestore: $error');
-        }
-      }
-    }
 
-    setState(() {
-      controllers.removeAt(index);
-    });
+          print('Document deleted from Firestore successfully!');
+          setState(() {
+            controllers.removeAt(index);
+          }); // Update UI after successful deletion
+        } catch (error) {
+          print('Error deleting document: $error');
+          // Display user-friendly error message
+        }
+      } else {
+        print('Document ID is empty. Cannot delete.');
+      }
+    } else {
+      print('Invalid index provided for deletion.');
+    }
   }
 
   Future<void> _fetchCategories() async {
@@ -108,30 +115,33 @@ class _CategoryState extends State<Category> {
     }
   }
 
-  void _saveToFirebase() async {
+  Future<void> _saveToFirebase() async {
     final CollectionReference categoriesRef =
         FirebaseFirestore.instance.collection('categories');
-
-    WriteBatch batch = FirebaseFirestore.instance.batch();
 
     try {
       for (int i = 0; i < controllers.length; i++) {
         String fieldValue = controllers[i].text;
         if (fieldValue.isNotEmpty) {
-          // Check if the field already exists
+          // Check if name already exists
           bool fieldExists = await fieldExistsInCollection(
               categoriesRef, 'categoryName', fieldValue);
+
           if (!fieldExists) {
-            // Create the field if it doesn't exist
-            batch.set(categoriesRef.doc(), {'categoryName': fieldValue});
+            // Generate unique ID and create document
+            String documentId = fieldValue;
+            await categoriesRef.doc(documentId).set({
+              'categoryName': fieldValue,
+              // Add other fields if needed
+            });
+            print('Document created with ID: $documentId');
           } else {
-            // Handle duplicate detection (e.g., display message, append number)
+            // Handle duplicate, e.g., display message or append number
             print(
                 'Field "categoryName" already exists. Skipping creation for "$fieldValue".');
           }
         }
       }
-      await batch.commit();
       print('Data saved to Firestore successfully!');
     } catch (error) {
       print('Error saving data to Firestore: $error');

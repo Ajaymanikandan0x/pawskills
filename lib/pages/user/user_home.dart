@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../user/functions/main_functios_user.dart';
-import 'admin_functions/admin_function.dart';
-import 'admin_functions/petImg.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+import '../user/functions/main_functios_user.dart';
+import 'functions/user_category.dart';
+
+class UserHome extends StatefulWidget {
+  const UserHome({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<UserHome> createState() => _UserHomeState();
 }
 
-class _HomeState extends State<Home> {
+class _UserHomeState extends State<UserHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,9 +30,9 @@ class _HomeState extends State<Home> {
         padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
         child: Column(
           children: [
-            categoryList(context),
+            userCategoryList(context),
             const SizedBox(height: 40),
-            Expanded(child: petListView()),
+            Expanded(child: userPetLstView()),
           ],
         ),
       ),

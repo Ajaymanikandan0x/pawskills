@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pawskills/pages/admin/admin_functions/admin_function.dart';
+import 'package:pawskills/pages/admin/pet_info.dart';
 
 // ____________________________imgadd_______________________________________
 Widget petImg({
@@ -43,10 +45,10 @@ Widget petImg({
       ),
     );
 
-// ________________________pet_name-____________________________________________
+// ________________________pet_name-simple Text_form-field____________________________________________
 
 Widget nameField(
-        {String? Hint_text,
+        {String? hintText,
         TextEditingController? controller,
         String? Function(String?)? validate,
         int? maxLines = 1}) =>
@@ -70,14 +72,14 @@ Widget nameField(
             width: 2.0,
           ),
         ),
-        hintText: Hint_text,
+        hintText: hintText,
         hintStyle: TextStyle(color: Colors.grey[500]),
       ),
       controller: controller,
       validator: validate,
     );
 
-// _______________________________pet_List_view_____________________________________
+// _______________________________pet_List_view_________________________________
 
 Widget petListView() => StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -104,11 +106,24 @@ Widget petListView() => StreamBuilder<QuerySnapshot>(
             final petname = category['petName'];
             final energyLevel = category['energyLevel'];
             final petdetails = category['petDetails'];
+            final life_expectancy = category['life_expectancy'];
+            final detailsPhoto = category['detailsPhoto'];
+
             return petCard(
+                context: context,
                 imgBase64: img,
                 petname: petname,
                 energyLevel: energyLevel,
-                petdetails: petdetails);
+                petdetails: petdetails,
+                ontap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => AddPetInfo(
+                          detailImage: detailsPhoto,
+                          petName: petname,
+                          energyLevel: energyLevel,
+                          petDetails: petdetails,
+                          lifeExpectancy: life_expectancy)));
+                });
           },
           separatorBuilder: (BuildContext context, int index) => const SizedBox(
             width: 8.0,
@@ -119,12 +134,13 @@ Widget petListView() => StreamBuilder<QuerySnapshot>(
 
 // ___________________________________card_view_______________________________________
 
-Widget petCard({
-  required String imgBase64,
-  required String petname,
-  required String energyLevel,
-  required String petdetails,
-}) {
+Widget petCard(
+    {required String imgBase64,
+    required String petname,
+    required String energyLevel,
+    required String petdetails,
+    required void Function()? ontap,
+    required BuildContext context}) {
   Uint8List? img;
   try {
     img = base64Decode(imgBase64);
@@ -132,69 +148,65 @@ Widget petCard({
     print('Error decoding image: $e');
   }
 
-  return Card(
-    color: Colors.white,
-    elevation: 10,
-    shadowColor: Colors.grey,
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 100,
-          width: 100,
-          child: img != null
-              ? Image.memory(img, fit: BoxFit.cover)
-              : const Placeholder(),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  petname,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  energyLevel,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                Flexible(
-                  fit: FlexFit.loose,
-                  child: SingleChildScrollView(
-                    child: Text(
-                      maxLines: 2,
-                      petdetails,
-                      style: const TextStyle(fontSize: 16),
+  return InkWell(
+    onTap: ontap,
+    child: Card(
+      color: Colors.white,
+      elevation: 10,
+      shadowColor: Colors.grey,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 100,
+            width: 100,
+            child: img != null
+                ? Image.memory(img, fit: BoxFit.cover)
+                : const Placeholder(),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    petname,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    energyLevel,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: SingleChildScrollView(
+                      child: Text(
+                        maxLines: 2,
+                        petdetails,
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-        Container(
-            height: 30,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ],
-            ),
-            child: const Icon(Icons.edit)),
-      ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: edit(
+                icon_size: 18,
+                ontap: () {
+                  Navigator.pushNamed(context, '/addnewpet');
+                }),
+          )
+        ],
+      ),
     ),
   );
 }

@@ -78,8 +78,8 @@ Widget homePageCategory({required String text, void Function()? ontap}) =>
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 4,
-              blurRadius: 5,
+              spreadRadius: 2,
+              blurRadius: 3,
               offset: const Offset(0, 3), // changes position of shadow
             ),
           ],
@@ -213,4 +213,32 @@ Widget _buildNavItem({
           ),
         ],
       ),
+    );
+
+Widget edit(
+        {double height = 30,
+        double? width = 30,
+        double icon_size = 10,
+        void Function()? ontap}) =>
+    InkWell(
+      onTap: ontap,
+      child: Container(
+          height: height,
+          width: width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.8),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.edit,
+            size: icon_size,
+          )),
     );

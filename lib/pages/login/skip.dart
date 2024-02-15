@@ -21,50 +21,52 @@ class Skip extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-          child: Column(children: <Widget>[
-            const SizedBox(height: 30),
-            SizedBox(
-              width: double.infinity,
-              height: 300,
-              child: Image.asset(
-                'assets/img/photos/skiplogo.png',
-                fit: BoxFit.cover,
+          child: SingleChildScrollView(
+            child: Column(children: <Widget>[
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                height: 300,
+                child: Image.asset(
+                  'assets/img/photos/skiplogo.png',
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            const SizedBox(height: 40),
-            const Text(
-              'My Pets',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CarouselSlider(
-                  items: items,
-                  options: CarouselOptions(
-                    height: 250,
-                    aspectRatio: 16 / 9,
-                    viewportFraction: 1,
-                    initialPage: 0,
-                    enableInfiniteScroll: true,
-                    reverse: false,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 4),
-                    autoPlayAnimationDuration:
-                        const Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
-                    enlargeFactor: 0.3,
-                    scrollDirection: Axis.horizontal,
-                  )),
-            ),
-            //goto home page
-            button(
-                text: 'Skip',
-                ontap: () {
-                  Navigator.pushNamed(context, '/home');
-                },
-                width: 350)
-          ]),
+              const SizedBox(height: 40),
+              const Text(
+                'My Pets',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CarouselSlider(
+                    items: items,
+                    options: CarouselOptions(
+                      height: 250,
+                      aspectRatio: 16 / 9,
+                      viewportFraction: 1,
+                      initialPage: 0,
+                      enableInfiniteScroll: true,
+                      reverse: false,
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 4),
+                      autoPlayAnimationDuration:
+                          const Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      enlargeCenterPage: true,
+                      enlargeFactor: 0.3,
+                      scrollDirection: Axis.horizontal,
+                    )),
+              ),
+              //goto home page
+              button(
+                  text: 'Skip',
+                  ontap: () {
+                    Navigator.pushNamed(context, '/userHome');
+                  },
+                  width: 350)
+            ]),
+          ),
         ),
       ),
     );

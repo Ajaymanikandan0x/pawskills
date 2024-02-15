@@ -164,23 +164,33 @@ class Register extends StatelessWidget {
         final String password = passwordController.text;
         final String firstName = firstname.text.trim();
         final String lastName = lastname.text.trim();
-        //create the user in fire base
+
+        // Create the user in Firebase
         final UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
         final User user = userCredential.user!;
-        // save user details in firestore
+
+        // Set the role based on email domain
+        String role = 'user';
+        if (email.endsWith('@admin.com')) {
+          role = 'admin';
+        }
+
+        // Save user details in Firestore
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'firstName': firstName,
           'lastName': lastName,
           'email': email,
+          'role': role, // Set user's role
         });
+
         Navigator.pushReplacementNamed(context, '/longin');
       } catch (e) {
-        print('Error to add Email and password $e ');
+        print('Error adding email and password: $e');
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to Long in. Please check your credentials.'),
+            content: Text('Failed to log in. Please check your credentials.'),
           ),
         );
       }
