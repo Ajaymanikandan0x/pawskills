@@ -34,7 +34,7 @@ class Root extends StatelessWidget {
               button(
                   text: 'Long in',
                   ontap: () {
-                    Navigator.pushNamed(context, '/longin');
+                    Navigator.pushNamed(context, '/login');
                   }),
               const SizedBox(height: 20),
               Row(

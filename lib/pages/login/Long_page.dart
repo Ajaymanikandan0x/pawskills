@@ -151,7 +151,7 @@ class UserLogin extends StatelessWidget {
         if (userRole == 'admin') {
           Navigator.pushReplacementNamed(context, '/home');
         } else {
-          Navigator.pushReplacementNamed(context, '/RegPet');
+          Navigator.pushReplacementNamed(context, '/skip');
         }
       } catch (e) {
         // Handle any login errors

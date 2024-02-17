@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../user/functions/main_functios_user.dart';
 import 'functions/user_category.dart';
+import 'functions/user_pet_view.dart';
 
 class UserHome extends StatefulWidget {
   const UserHome({super.key});
@@ -18,7 +19,7 @@ class _UserHomeState extends State<UserHome> {
           backgroundColor: Colors.grey[200],
           centerTitle: true,
           title: const Text(
-            'PetRegistry',
+            'Pet Registry',
             style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
           ),
           actions: [
@@ -32,7 +33,7 @@ class _UserHomeState extends State<UserHome> {
           children: [
             userCategoryList(context),
             const SizedBox(height: 40),
-            Expanded(child: userPetLstView()),
+            const Expanded(child: UserPetView()),
           ],
         ),
       ),

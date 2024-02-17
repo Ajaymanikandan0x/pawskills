@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import '../admin_profile.dart';
-import '../home.dart';
+import 'package:pawskills/pages/user/user_home.dart';
+import 'package:pawskills/pages/user/user_profile.dart';
+import 'package:pawskills/pages/user/user_wishlist.dart';
 
-class AdminNavbar extends StatefulWidget {
-  const AdminNavbar({Key? key}) : super(key: key);
+class UserNavbar extends StatefulWidget {
+  const UserNavbar({Key? key}) : super(key: key);
 
   @override
-  State<AdminNavbar> createState() => _AdminNavbarState();
+  State<UserNavbar> createState() => _UserNavbarState();
 }
 
-class _AdminNavbarState extends State<AdminNavbar> {
+class _UserNavbarState extends State<UserNavbar> {
   int selectTab = 0;
 
   @override
@@ -33,13 +34,22 @@ class _AdminNavbarState extends State<AdminNavbar> {
                   isSelected: selectTab == 0,
                 ),
                 TabButton(
-                  icon: Icons.person,
+                  icon: Icons.favorite_border_outlined,
                   onTap: () {
                     setState(() {
                       selectTab = 1;
                     });
                   },
                   isSelected: selectTab == 1,
+                ),
+                TabButton(
+                  icon: Icons.person,
+                  onTap: () {
+                    setState(() {
+                      selectTab = 2;
+                    });
+                  },
+                  isSelected: selectTab == 2,
                 ),
               ],
             ),
@@ -52,10 +62,11 @@ class _AdminNavbarState extends State<AdminNavbar> {
   Widget _buildBody() {
     switch (selectTab) {
       case 0:
-        return const Home();
+        return const UserHome();
       case 1:
-        return const AdminProf();
-
+        return const UserWishlist();
+      case 2:
+        return const UserProf();
       default:
         return const SizedBox(); // Handle any other case
     }

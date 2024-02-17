@@ -6,21 +6,28 @@ import 'package:pawskills/pages/admin/admin_functions/admin_function.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
 import 'package:pawskills/pages/user/functions/main_functios_user.dart';
 
+import 'add_new_pet.dart';
+
 class AddPetInfo extends StatelessWidget {
   final String detailImage;
   final String energyLevel;
   final String petName;
   final String petDetails;
   final String lifeExpectancy;
+  final String imgBase64;
+  final String avgHeight;
+  final String avgWeight;
 
-  const AddPetInfo({
-    super.key,
-    required this.detailImage,
-    required this.petName,
-    required this.energyLevel,
-    required this.petDetails,
-    required this.lifeExpectancy,
-  });
+  const AddPetInfo(
+      {super.key,
+      required this.detailImage,
+      required this.petName,
+      required this.energyLevel,
+      required this.petDetails,
+      required this.lifeExpectancy,
+      required this.imgBase64,
+      required this.avgHeight,
+      required this.avgWeight});
 
   @override
   Widget build(BuildContext context) {
@@ -86,12 +93,25 @@ class AddPetInfo extends StatelessWidget {
                               color: Colors.grey[700])),
                       const SizedBox(width: 10),
                       edit(
-                          width: 30,
-                          height: 30,
-                          icon_size: 18,
-                          ontap: () {
-                            Navigator.pushNamed(context, '/addnewpet');
-                          }),
+                        icon_size: 18,
+                        ontap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddNewPet(
+                                avgheight: avgHeight,
+                                avgweight: avgWeight,
+                                petName: petName,
+                                petDetails: petDetails,
+                                lifeExpectancy: lifeExpectancy,
+                                energyLevel: energyLevel,
+                                listPhotoBase64: imgBase64,
+                                detailsPhotoBase64: detailImage,
+                              ),
+                            ),
+                          );
+                        },
+                      )
                     ],
                   ),
                 ),

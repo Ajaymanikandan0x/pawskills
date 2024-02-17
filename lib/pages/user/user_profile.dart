@@ -34,6 +34,7 @@ class _UserProfState extends State<UserProf> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Edit Profile',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
@@ -42,7 +43,9 @@ class _UserProfState extends State<UserProf> {
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app),
-            onPressed: () {},
+            onPressed: () {
+              _signOut(context);
+            },
           ),
         ],
         backgroundColor: Colors.grey[200],
@@ -91,7 +94,14 @@ class _UserProfState extends State<UserProf> {
             ),
             const SizedBox(height: 80),
             Center(
-                child: button(text: 'Save Changes', ontap: () {}, width: 350))
+              child: button(
+                text: 'Save Changes',
+                ontap: () {
+                  _saveChanges();
+                },
+                width: 350,
+              ),
+            ),
           ],
         ),
       ),
@@ -126,9 +136,12 @@ class _UserProfState extends State<UserProf> {
   }
 
   Widget _text(String text) => Padding(
-      padding: const EdgeInsets.only(left: 20),
-      child: Text(text,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)));
+        padding: const EdgeInsets.only(left: 20),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+      );
 
   Future<void> fetchUserData() async {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -140,7 +153,51 @@ class _UserProfState extends State<UserProf> {
         firstNameController.text = snapshot.get('firstName') ?? '';
         lastNameController.text = snapshot.get('lastName') ?? '';
         emailController.text = snapshot.get('email') ?? '';
+        photoBase64 = snapshot.get('photo') ?? '';
       });
+    }
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Navigate to the login screen after signing out
+      Navigator.pushReplacementNamed(context, '/login');
+    } catch (e) {
+      print('Error signing out: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to sign out. Please try again.'),
+        ),
+      );
+    }
+  }
+
+  void _saveChanges() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    final currentUserDocRef =
+        FirebaseFirestore.instance.collection('users').doc(user?.uid);
+
+    try {
+      await currentUserDocRef.update({
+        'firstName': firstNameController.text,
+        'lastName': lastNameController.text,
+        'email': emailController.text,
+        'photo': photoBase64,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile updated successfully!'),
+        ),
+      );
+    } catch (error) {
+      print("Error updating profile: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to update profile. Please try again.'),
+        ),
+      );
     }
   }
 }

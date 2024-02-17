@@ -140,7 +140,7 @@ class Register extends StatelessWidget {
                     InkWell(
                       //redirect to login page
                       onTap: () {
-                        Navigator.pushNamed(context, '/longin');
+                        Navigator.pushNamed(context, '/login');
                       },
                       child: const Text(
                         'Long in',
@@ -183,8 +183,12 @@ class Register extends StatelessWidget {
           'email': email,
           'role': role, // Set user's role
         });
-
-        Navigator.pushReplacementNamed(context, '/longin');
+        if (email.endsWith('@admin.com')) {
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+        {
+          Navigator.pushReplacementNamed(context, '/RegPet');
+        }
       } catch (e) {
         print('Error adding email and password: $e');
 

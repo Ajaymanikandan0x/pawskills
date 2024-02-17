@@ -41,7 +41,7 @@ Widget addnew(
           validator: validate,
           readOnly: readOnly,
         )),
-        SizedBox(width: 8.0),
+        const SizedBox(width: 8.0),
         InkWell(
           onTap: ontap,
           child: Container(
@@ -146,7 +146,7 @@ Widget categoryList(BuildContext context) => Row(
 
 void _navigateToCategory(BuildContext context, String categoryName) {
   switch (categoryName) {
-    case 'Edit':
+    case 'Edit_category':
       Navigator.pushNamed(context, '/category');
       break;
     case 'Add-Pet':
@@ -161,59 +161,6 @@ void _navigateToCategory(BuildContext context, String categoryName) {
       break;
   }
 }
-
-// ________________________________bottom_navbar________________________________
-
-Widget customNavBar({
-  required List<IconData> icons,
-  required int currentIndex,
-  required void Function(int) onTap,
-}) =>
-    Container(
-      height: 60,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(icons.length, (index) {
-          final icon = icons[index];
-
-          return _buildNavItem(
-            icon: icon,
-            onTap: () => onTap(index),
-            isActive: currentIndex == index,
-          );
-        }),
-      ),
-    );
-
-Widget _buildNavItem({
-  required IconData icon,
-  required VoidCallback onTap,
-  required bool isActive,
-}) =>
-    InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? Colors.blue : Colors.black,
-          ),
-        ],
-      ),
-    );
 
 Widget edit(
         {double height = 30,
@@ -241,4 +188,59 @@ Widget edit(
             Icons.edit,
             size: icon_size,
           )),
+    );
+// ___________________________________delete_pet________________________________
+
+Widget deleteIcon(
+        {required BuildContext context,
+        required String petName,
+        required Function() deletePet}) =>
+    GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Delete Pet'),
+              content: Text('Are you sure you want to delete $petName?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    try {
+                      // Perform deletion logic here
+                      await deletePet();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Pet $petName deleted successfully!'),
+                        ),
+                      );
+                      Navigator.of(context).pop(); // Close the dialog
+                    } catch (error) {
+                      print('Error deleting pet: $error');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('An error occurred while deleting the pet.'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Delete'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      child: Icon(
+        Icons.delete,
+        size: 30,
+        color: Colors.grey[700],
+      ),
     );

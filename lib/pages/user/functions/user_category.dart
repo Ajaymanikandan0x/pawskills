@@ -83,13 +83,14 @@ Widget userCategoryList(BuildContext context) => Row(
 void _userNavigateToCategory(BuildContext context, String categoryName) {
   switch (categoryName) {
     case 'Cat':
-      Navigator.pushNamed(context, '/userprof');
+      // Navigator.pushNamed(context, '/userprof');
       break;
     case 'Add-Pet':
       Navigator.pushNamed(context, '/user_pet_add');
       break;
     case 'Dog':
-    // Navigator.pushNamed(context, '/category');
+      // Navigator.pushNamed(context, '/wishlist');
+      break;
     // Add more cases for additional category names and corresponding routes
     default:
       // If the category name doesn't match any predefined routes, you can handle it here

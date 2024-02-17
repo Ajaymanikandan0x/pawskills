@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
 import 'package:pawskills/pages/user/functions/main_functios_user.dart';
 
-class UserPetInfo extends StatelessWidget {
+class UserPetInfo extends StatefulWidget {
+  final String imgBase64;
   final String detailImage;
   final String energyLevel;
   final String petName;
@@ -12,19 +15,33 @@ class UserPetInfo extends StatelessWidget {
   final String lifeExpectancy;
 
   const UserPetInfo({
-    super.key,
+    Key? key,
     required this.detailImage,
+    required this.imgBase64,
     required this.petName,
     required this.energyLevel,
     required this.petDetails,
     required this.lifeExpectancy,
-  });
+  }) : super(key: key);
+
+  @override
+  _UserPetInfoState createState() => _UserPetInfoState();
+}
+
+class _UserPetInfoState extends State<UserPetInfo> {
+  bool isWished = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkWishlist();
+  }
 
   @override
   Widget build(BuildContext context) {
     Uint8List? imageBytes;
     try {
-      imageBytes = base64Decode(detailImage);
+      imageBytes = base64Decode(widget.detailImage);
     } catch (e) {
       print('Error decoding image: $e');
     }
@@ -52,7 +69,7 @@ class UserPetInfo extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Text(
-                    petName,
+                    widget.petName,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 29,
@@ -68,7 +85,7 @@ class UserPetInfo extends StatelessWidget {
                       bell(icon: Icons.upgrade_outlined, width: 45, height: 45),
                       const SizedBox(width: 10),
                       Text(
-                        energyLevel,
+                        widget.energyLevel,
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -77,19 +94,18 @@ class UserPetInfo extends StatelessWidget {
                       const SizedBox(width: 10),
                       bell(icon: Icons.timelapse, height: 45, width: 45),
                       const SizedBox(width: 10),
-                      Text(lifeExpectancy,
+                      Text(widget.lifeExpectancy,
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: Colors.grey[700])),
                       const SizedBox(width: 10),
-                      wish(
-                          width: 30,
-                          height: 30,
-                          icon_size: 18,
-                          ontap: () {
-                            // Navigator.pushNamed(context, '/wishlist');
-                          }),
+                      wishButton(
+                        isWished: isWished,
+                        onTap: () {
+                          _toggleWishlist();
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -97,7 +113,7 @@ class UserPetInfo extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    petDetails,
+                    widget.petDetails,
                     style: const TextStyle(
                         fontWeight: FontWeight.w400, fontSize: 18),
                     maxLines: null,
@@ -112,5 +128,53 @@ class UserPetInfo extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _toggleWishlist() async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final wishlistRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('wishlist');
+
+      if (isWished) {
+        await wishlistRef.doc(widget.petName).delete();
+      } else {
+        // Save all pet data to the wishlist
+        await wishlistRef.doc(widget.petName).set({
+          'petName': widget.petName,
+          'energyLevel': widget.energyLevel,
+          'petDetails': widget.petDetails,
+          'lifeExpectancy': widget.lifeExpectancy,
+          'detailsPhoto': widget.detailImage,
+          'listPhoto': widget.imgBase64
+        });
+      }
+
+      setState(() {
+        isWished = !isWished;
+      });
+    } catch (e) {
+      print('Error toggling wishlist: $e');
+    }
+  }
+
+  Future<void> _checkWishlist() async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final wishlistDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('wishlist')
+          .doc(widget.petName)
+          .get();
+
+      setState(() {
+        isWished = wishlistDoc.exists;
+      });
+    } catch (e) {
+      print('Error checking wishlist: $e');
+    }
   }
 }

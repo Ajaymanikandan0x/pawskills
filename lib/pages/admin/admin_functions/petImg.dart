@@ -80,133 +80,150 @@ Widget nameField(
     );
 
 // _______________________________pet_List_view_________________________________
-
-Widget petListView() => StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('categories')
-          .doc('Dog')
-          .collection('List')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final List<DocumentSnapshot> documents = snapshot.data!.docs;
-
-        return ListView.separated(
-          itemCount: documents.length,
-          itemBuilder: (context, index) {
-            final category = documents[index].data() as Map<String, dynamic>;
-            final img = category['listPhoto'];
-            final petname = category['petName'];
-            final energyLevel = category['energyLevel'];
-            final petdetails = category['petDetails'];
-            final life_expectancy = category['life_expectancy'];
-            final detailsPhoto = category['detailsPhoto'];
-
-            return petCard(
-                context: context,
-                imgBase64: img,
-                petname: petname,
-                energyLevel: energyLevel,
-                petdetails: petdetails,
-                ontap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => AddPetInfo(
-                          detailImage: detailsPhoto,
-                          petName: petname,
-                          energyLevel: energyLevel,
-                          petDetails: petdetails,
-                          lifeExpectancy: life_expectancy)));
-                });
-          },
-          separatorBuilder: (BuildContext context, int index) => const SizedBox(
-            width: 8.0,
-          ),
-        );
-      },
-    );
-
-// ___________________________________card_view_______________________________________
-
-Widget petCard(
-    {required String imgBase64,
-    required String petname,
-    required String energyLevel,
-    required String petdetails,
-    required void Function()? ontap,
-    required BuildContext context}) {
-  Uint8List? img;
-  try {
-    img = base64Decode(imgBase64);
-  } catch (e) {
-    print('Error decoding image: $e');
-  }
-
-  return InkWell(
-    onTap: ontap,
-    child: Card(
-      color: Colors.white,
-      elevation: 10,
-      shadowColor: Colors.grey,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 100,
-            width: 100,
-            child: img != null
-                ? Image.memory(img, fit: BoxFit.cover)
-                : const Placeholder(),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    petname,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    energyLevel,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: SingleChildScrollView(
-                      child: Text(
-                        maxLines: 2,
-                        petdetails,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: edit(
-                icon_size: 18,
-                ontap: () {
-                  Navigator.pushNamed(context, '/addnewpet');
-                }),
-          )
-        ],
-      ),
-    ),
-  );
-}
+//
+// Widget petListView() => StreamBuilder<QuerySnapshot>(
+//       stream: FirebaseFirestore.instance
+//           .collection('categories')
+//           .doc('Dog')
+//           .collection('List')
+//           .snapshots(),
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.waiting) {
+//           return const Center(child: CircularProgressIndicator());
+//         }
+//
+//         if (snapshot.hasError) {
+//           return Center(child: Text('Error: ${snapshot.error}'));
+//         }
+//
+//         final List<DocumentSnapshot> documents = snapshot.data!.docs;
+//
+//         return ListView.separated(
+//           itemCount: documents.length,
+//           itemBuilder: (context, index) {
+//             final category = documents[index].data() as Map<String, dynamic>;
+//             final img = category['listPhoto'];
+//             final petname = category['petName'];
+//             final energyLevel = category['energyLevel'];
+//             final petdetails = category['petDetails'];
+//             final life_expectancy = category['life_expectancy'];
+//             final detailsPhoto = category['detailsPhoto'];
+//             final avgheight = category['height'];
+//             final avgweight = category['weight'];
+//
+//             return petCard(
+//                 context: context,
+//                 imgBase64: img,
+//                 petname: petname,
+//                 energyLevel: energyLevel,
+//                 petdetails: petdetails,
+//                 ontap: () {
+//                   Navigator.of(context).push(MaterialPageRoute(
+//                       builder: (context) => AddPetInfo(
+//                             imgBase64: img,
+//                             detailImage: detailsPhoto,
+//                             petName: petname,
+//                             energyLevel: energyLevel,
+//                             petDetails: petdetails,
+//                             lifeExpectancy: life_expectancy,
+//                             avgHeight: avgheight,
+//                             avgWeight: avgweight,
+//                           )));
+//                 });
+//           },
+//           separatorBuilder: (BuildContext context, int index) => const SizedBox(
+//             width: 8.0,
+//           ),
+//         );
+//       },
+//     );
+//
+// // ___________________________________card_view_______________________________________
+//
+// Widget petCard(
+//     {required String imgBase64,
+//     required String petname,
+//     required String energyLevel,
+//     required String petdetails,
+//     required void Function()? ontap,
+//     required BuildContext context}) {
+//   Uint8List? img;
+//   try {
+//     img = base64Decode(imgBase64);
+//   } catch (e) {
+//     print('Error decoding image: $e');
+//   }
+//
+//   return InkWell(
+//     onTap: ontap,
+//     child: Card(
+//       color: Colors.white,
+//       elevation: 10,
+//       shadowColor: Colors.grey,
+//       child: Row(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           SizedBox(
+//             height: 100,
+//             width: 100,
+//             child: img != null
+//                 ? Image.memory(img, fit: BoxFit.cover)
+//                 : const Placeholder(),
+//           ),
+//           const SizedBox(width: 8),
+//           Expanded(
+//             child: Padding(
+//               padding: const EdgeInsets.symmetric(vertical: 8.0),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 mainAxisSize: MainAxisSize.min,
+//                 children: [
+//                   Text(
+//                     petname,
+//                     style: const TextStyle(
+//                         fontSize: 18, fontWeight: FontWeight.w600),
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Text(
+//                     energyLevel,
+//                     style: const TextStyle(fontSize: 16),
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Flexible(
+//                     fit: FlexFit.loose,
+//                     child: SingleChildScrollView(
+//                       child: Text(
+//                         maxLines: 2,
+//                         petdetails,
+//                         style: const TextStyle(fontSize: 16),
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//           Padding(
+//             padding: const EdgeInsets.all(10),
+//             child: deleteIcon(
+//                 context: context,
+//                 petName: petname,
+//                 deletePet: () async {
+//                   await deletePet(petname: petname);
+//                 }),
+//           )
+//         ],
+//       ),
+//     ),
+//   );
+// }
+//
+// Future<void> deletePet({required String petname}) async {
+//   final petId = petname;
+//   await FirebaseFirestore.instance
+//       .collection('categories')
+//       .doc('Dog')
+//       .collection('List')
+//       .doc(petId)
+//       .delete();
+// }

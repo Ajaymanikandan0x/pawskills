@@ -9,7 +9,26 @@ import 'package:pawskills/pages/login/functions/formfield.dart';
 import 'admin_functions/petImg.dart';
 
 class AddNewPet extends StatefulWidget {
-  const AddNewPet({super.key});
+  final String? petName;
+  final String? petDetails;
+  final String? lifeExpectancy;
+  final String? energyLevel;
+  final String? listPhotoBase64;
+  final String? detailsPhotoBase64;
+  final String? avgheight;
+  final String? avgweight;
+
+  const AddNewPet(
+      {Key? key,
+      this.petName,
+      this.petDetails,
+      this.lifeExpectancy,
+      this.energyLevel,
+      this.listPhotoBase64,
+      this.detailsPhotoBase64,
+      this.avgheight,
+      this.avgweight})
+      : super(key: key);
 
   @override
   State<AddNewPet> createState() => _AddBewPetState();
@@ -19,15 +38,40 @@ class _AddBewPetState extends State<AddNewPet> {
   final petNameController = TextEditingController();
   final petDetailsController = TextEditingController();
   final temperamentController = TextEditingController();
-  final weightController = TextEditingController();
-  final heightController = TextEditingController();
   final energyLevelController = TextEditingController();
+  final avgHeightController = TextEditingController();
+  final avgWeightController = TextEditingController();
 
   File? listPhoto; // Image for the list-photo field
   File? detailsPhoto; // Image for the Details-photo field
 
   String? listPhotoBase64; // Base64 string for the list-photo field
   String? detailsPhotoBase64; // Base64 string for the Details-photo field
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.petName != null) {
+      petNameController.text = widget.petName!;
+    }
+    if (widget.petDetails != null) {
+      petDetailsController.text = widget.petDetails!;
+    }
+    if (widget.lifeExpectancy != null) {
+      temperamentController.text = widget.lifeExpectancy!;
+    }
+    if (widget.energyLevel != null) {
+      energyLevelController.text = widget.energyLevel!;
+    }
+    if (widget.avgweight != null) {
+      avgWeightController.text = widget.avgweight!;
+    }
+    if (widget.avgheight != null) {
+      avgHeightController.text = widget.avgweight!;
+    }
+    listPhotoBase64 = widget.listPhotoBase64;
+    detailsPhotoBase64 = widget.detailsPhotoBase64;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,13 +144,13 @@ class _AddBewPetState extends State<AddNewPet> {
                 pet_bmi(
                     Hint_text: 'AVG Weight',
                     inputIcon: const Icon(Icons.monitor_weight_outlined),
-                    controller: heightController,
+                    controller: avgHeightController,
                     hi_wi: 'KG'),
                 const SizedBox(height: 10),
                 pet_bmi(
                     Hint_text: 'AVG Height',
                     inputIcon: const Icon(Icons.height),
-                    controller: weightController,
+                    controller: avgWeightController,
                     hi_wi: 'CM'),
                 const SizedBox(height: 20),
                 button(
@@ -173,8 +217,8 @@ class _AddBewPetState extends State<AddNewPet> {
       'petName': petNameController.text,
       'petDetails': petDetailsController.text,
       'life_expectancy': temperamentController.text,
-      'weight': weightController.text,
-      'height': heightController.text,
+      'weight': avgWeightController.text,
+      'height': avgHeightController.text,
       'energyLevel': energyLevelController.text,
       'listPhoto': listPhotoBase64, // Store both image base64 strings
       'detailsPhoto': detailsPhotoBase64, // Store image as base64 string
@@ -194,8 +238,8 @@ class _AddBewPetState extends State<AddNewPet> {
       petNameController.clear();
       petDetailsController.clear();
       temperamentController.clear();
-      weightController.clear();
-      heightController.clear();
+      avgWeightController.clear();
+      avgHeightController.clear();
       energyLevelController.clear();
       setState(() {
         listPhotoBase64 = null;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../user/functions/main_functios_user.dart';
 import 'admin_functions/admin_function.dart';
-import 'admin_functions/petImg.dart';
+
+import 'admin_functions/pet_list_view.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -18,7 +19,7 @@ class _HomeState extends State<Home> {
           backgroundColor: Colors.grey[200],
           centerTitle: true,
           title: const Text(
-            'PetRegistry',
+            'Pet Registry',
             style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
           ),
           actions: [
@@ -32,7 +33,7 @@ class _HomeState extends State<Home> {
           children: [
             categoryList(context),
             const SizedBox(height: 40),
-            Expanded(child: petListView()),
+            const Expanded(child: PetListView()),
           ],
         ),
       ),

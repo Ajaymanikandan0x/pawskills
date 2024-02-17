@@ -8,12 +8,12 @@ import 'package:pawskills/pages/login/Long_page.dart';
 import 'package:pawskills/pages/login/Register_page.dart';
 import 'package:pawskills/pages/login/Register_pet.dart';
 import 'package:pawskills/pages/login/rootpage.dart';
-import 'package:pawskills/pages/admin/home.dart';
 import 'package:pawskills/pages/login/skip.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:pawskills/pages/user/user_home.dart';
+import 'package:pawskills/pages/user/user_navbar.dart';
 import 'package:pawskills/pages/user/user_pet_details.dart';
 import 'package:pawskills/pages/user/user_profile.dart';
+import 'package:pawskills/pages/user/user_wishlist.dart';
 
 import 'firebase_options.dart';
 
@@ -32,15 +32,16 @@ void main() async {
         '/': (context) => const Root(),
         '/register': (context) => Register(),
         '/RegPet': (context) => const RegPet(),
-        '/longin': (context) => UserLogin(),
+        '/login': (context) => UserLogin(),
         '/skip': (context) => const Skip(),
-        '/home': (context) => const Home(),
+        '/home': (context) => const AdminNavbar(),
         '/category': (context) => const Category(),
         '/adminprof': (context) => const AdminProf(),
-        '/addnewpet': (context) => const AddNewPet(),
+        '/addnewpet': (context) => AddNewPet(),
         '/user_pet_add': (context) => UserPet(),
         '/userprof': (context) => UserProf(),
-        '/userHome': (context) => const UserHome()
+        '/userHome': (context) => const UserNavbar(),
+        '/wishlist': (context) => const UserWishlist(),
       },
     ),
   );

@@ -103,7 +103,7 @@ class _RegPetState extends State<RegPet> {
       'height': heightController.text,
     }).then((_) {
       // If data is successfully added, navigate to next screen
-      Navigator.pushNamedAndRemoveUntil(context, '/skip', (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }).catchError((e) {
       // Handle errors if any
       print('Error saving pet info: $e');
