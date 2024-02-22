@@ -67,7 +67,7 @@ class _AddBewPetState extends State<AddNewPet> {
       avgWeightController.text = widget.avgweight!;
     }
     if (widget.avgheight != null) {
-      avgHeightController.text = widget.avgweight!;
+      avgHeightController.text = widget.avgheight!;
     }
     listPhotoBase64 = widget.listPhotoBase64;
     detailsPhotoBase64 = widget.detailsPhotoBase64;
@@ -225,8 +225,16 @@ class _AddBewPetState extends State<AddNewPet> {
     };
 
     try {
-      // Use doc method to create a new document with custom ID (pet name)
-      await petsCollectionRef.doc(petNameController.text).set(petData);
+      // Check if the pet already exists
+      final existingPetDoc =
+          await petsCollectionRef.doc(petNameController.text).get();
+      if (existingPetDoc.exists) {
+        // Update the existing document
+        await petsCollectionRef.doc(petNameController.text).update(petData);
+      } else {
+        // Create a new document
+        await petsCollectionRef.doc(petNameController.text).set(petData);
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

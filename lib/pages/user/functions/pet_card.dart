@@ -60,12 +60,16 @@ class _PetCardState extends State<PetCard> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 100,
-              width: 100,
-              child: img != null
-                  ? Image.memory(img, fit: BoxFit.cover)
-                  : const Placeholder(),
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: 8, left: 8, bottom: 8, right: 8),
+              child: SizedBox(
+                height: 110,
+                width: 110,
+                child: img != null
+                    ? Image.memory(img, fit: BoxFit.cover)
+                    : const Placeholder(),
+              ),
             ),
             const SizedBox(width: 8),
             Expanded(

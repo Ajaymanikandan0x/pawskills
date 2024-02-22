@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
 import 'package:pawskills/pages/user/functions/main_functios_user.dart';
 
@@ -82,29 +84,56 @@ class _UserPetInfoState extends State<UserPetInfo> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      bell(icon: Icons.upgrade_outlined, width: 45, height: 45),
-                      const SizedBox(width: 10),
-                      Text(
-                        widget.energyLevel,
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[700]),
+                      Flexible(
+                        flex: 1,
+                        child: bell(
+                          icon: Icons.upgrade_outlined,
+                          width: 45,
+                          height: 45,
+                        ),
                       ),
                       const SizedBox(width: 10),
-                      bell(icon: Icons.timelapse, height: 45, width: 45),
-                      const SizedBox(width: 10),
-                      Text(widget.lifeExpectancy,
+                      Flexible(
+                        flex: 2,
+                        child: Text(
+                          widget.energyLevel,
                           style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700])),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 10),
-                      wishButton(
-                        isWished: isWished,
-                        onTap: () {
-                          _toggleWishlist();
-                        },
+                      Flexible(
+                        flex: 1,
+                        child: bell(
+                          icon: Icons.timelapse,
+                          height: 45,
+                          width: 45,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        flex: 2,
+                        child: Text(
+                          widget.lifeExpectancy,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        flex: 1,
+                        child: wishButton(
+                          isWished: isWished,
+                          onTap: () {
+                            _toggleWishlist();
+                          },
+                        ),
                       ),
                     ],
                   ),
