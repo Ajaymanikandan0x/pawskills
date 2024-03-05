@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pawskills/pages/admin/admin_functions/admin_function.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
@@ -108,7 +106,7 @@ class AddPetInfo extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Flexible(
-                        child: edit(
+                        child: editButton(
                           icon_size: 25,
                           width: 40,
                           height: 40,
@@ -146,7 +144,12 @@ class AddPetInfo extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                button(text: 'Training', ontap: () {}, width: 350)
+                button(
+                    text: 'Training',
+                    ontap: () {
+                      Navigator.pushNamed(context, '/admin_workout_list');
+                    },
+                    width: 350)
               ],
             ),
           ),

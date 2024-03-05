@@ -1,9 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
-import 'package:pawskills/pages/admin/admin_functions/admin_function.dart';
-import 'package:pawskills/pages/admin/pet_info.dart';
 
 // ____________________________imgadd_______________________________________
 Widget petImg({
@@ -58,7 +55,7 @@ Widget nameField(
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.only(left: 20, top: 15, bottom: 15),
         filled: true,
-        fillColor: Colors.white54,
+        fillColor: const Color(0xffC9C0C0),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
           borderSide: const BorderSide(

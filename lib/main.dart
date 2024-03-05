@@ -4,6 +4,8 @@ import 'package:pawskills/pages/admin/add_new_pet.dart';
 import 'package:pawskills/pages/admin/admin_functions/admin_navbar.dart';
 import 'package:pawskills/pages/admin/admin_profile.dart';
 import 'package:pawskills/pages/admin/category.dart';
+import 'package:pawskills/pages/admin/training/admin_workout_list.dart';
+import 'package:pawskills/pages/admin/workout_subAdd.dart';
 import 'package:pawskills/pages/login/Long_page.dart';
 import 'package:pawskills/pages/login/Register_page.dart';
 import 'package:pawskills/pages/login/Register_pet.dart';
@@ -42,6 +44,9 @@ void main() async {
         '/userprof': (context) => UserProf(),
         '/userHome': (context) => const UserNavbar(),
         '/wishlist': (context) => const UserWishlist(),
+        // -----------------workout---------------------
+        '/admin_workout_list': (context) => WorkoutList(),
+        '/newWorkout': (context) => NewWorkout(),
       },
     ),
   );

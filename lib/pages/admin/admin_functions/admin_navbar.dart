@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../admin_profile.dart';
 import '../home.dart';
+import '../workout_subAdd.dart';
 
 class AdminNavbar extends StatefulWidget {
   const AdminNavbar({Key? key}) : super(key: key);
@@ -33,13 +34,22 @@ class _AdminNavbarState extends State<AdminNavbar> {
                   isSelected: selectTab == 0,
                 ),
                 TabButton(
-                  icon: Icons.person,
+                  icon: Icons.add_box_outlined,
                   onTap: () {
                     setState(() {
                       selectTab = 1;
                     });
                   },
                   isSelected: selectTab == 1,
+                ),
+                TabButton(
+                  icon: Icons.person,
+                  onTap: () {
+                    setState(() {
+                      selectTab = 2;
+                    });
+                  },
+                  isSelected: selectTab == 2,
                 ),
               ],
             ),
@@ -54,6 +64,8 @@ class _AdminNavbarState extends State<AdminNavbar> {
       case 0:
         return const Home();
       case 1:
+        return const NewWorkout();
+      case 2:
         return const AdminProf();
 
       default:

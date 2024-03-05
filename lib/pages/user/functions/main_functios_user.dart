@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:pawskills/pages/user/functions/pet_card.dart';
-import '../usr_pet_info.dart';
 
 // __________________________________Home_____________________________________________
 Widget bell(

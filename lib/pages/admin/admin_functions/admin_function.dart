@@ -162,7 +162,7 @@ void _navigateToCategory(BuildContext context, String categoryName) {
   }
 }
 
-Widget edit(
+Widget editButton(
         {double height = 30,
         double? width = 30,
         double icon_size = 10,
@@ -243,4 +243,33 @@ Widget deleteIcon(
         size: 30,
         color: Colors.grey[700],
       ),
+    );
+// ___________________________________delete____________________________________
+
+Widget deleteButton(
+        {double height = 30,
+        double? width = 30,
+        double icon_size = 10,
+        void Function()? ontap}) =>
+    InkWell(
+      onTap: ontap,
+      child: Container(
+          height: height,
+          width: width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.8),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.delete,
+            size: icon_size,
+          )),
     );
