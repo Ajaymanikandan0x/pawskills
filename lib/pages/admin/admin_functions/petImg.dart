@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 // ____________________________imgadd_______________________________________
@@ -26,10 +24,21 @@ Widget petImg({
           ],
         ),
         child: selectimg != null
-            ? Image.memory(
-                base64Decode(selectimg), // Decode base64 string to bytes
-                fit: BoxFit.cover, // Adjust this to fit your UI requirements
-              ) // Display the selected image
+            ? Image.network(
+                selectimg,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: Text(
+                        text,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  );
+                },
+              )
             : Padding(
                 padding: const EdgeInsets.all(20),
                 child: Center(
@@ -37,7 +46,7 @@ Widget petImg({
                     text,
                     style: const TextStyle(color: Colors.grey),
                   ),
-                ), // Placeholder icon
+                ),
               ),
       ),
     );
@@ -76,151 +85,41 @@ Widget nameField(
       validator: validate,
     );
 
-// _______________________________pet_List_view_________________________________
-//
-// Widget petListView() => StreamBuilder<QuerySnapshot>(
-//       stream: FirebaseFirestore.instance
-//           .collection('categories')
-//           .doc('Dog')
-//           .collection('List')
-//           .snapshots(),
-//       builder: (context, snapshot) {
-//         if (snapshot.connectionState == ConnectionState.waiting) {
-//           return const Center(child: CircularProgressIndicator());
-//         }
-//
-//         if (snapshot.hasError) {
-//           return Center(child: Text('Error: ${snapshot.error}'));
-//         }
-//
-//         final List<DocumentSnapshot> documents = snapshot.data!.docs;
-//
-//         return ListView.separated(
-//           itemCount: documents.length,
-//           itemBuilder: (context, index) {
-//             final category = documents[index].data() as Map<String, dynamic>;
-//             final img = category['listPhoto'];
-//             final petname = category['petName'];
-//             final energyLevel = category['energyLevel'];
-//             final petdetails = category['petDetails'];
-//             final life_expectancy = category['life_expectancy'];
-//             final detailsPhoto = category['detailsPhoto'];
-//             final avgheight = category['height'];
-//             final avgweight = category['weight'];
-//
-//             return petCard(
-//                 context: context,
-//                 imgBase64: img,
-//                 petname: petname,
-//                 energyLevel: energyLevel,
-//                 petdetails: petdetails,
-//                 ontap: () {
-//                   Navigator.of(context).push(MaterialPageRoute(
-//                       builder: (context) => AddPetInfo(
-//                             imgBase64: img,
-//                             detailImage: detailsPhoto,
-//                             petName: petname,
-//                             energyLevel: energyLevel,
-//                             petDetails: petdetails,
-//                             lifeExpectancy: life_expectancy,
-//                             avgHeight: avgheight,
-//                             avgWeight: avgweight,
-//                           )));
-//                 });
-//           },
-//           separatorBuilder: (BuildContext context, int index) => const SizedBox(
-//             width: 8.0,
-//           ),
-//         );
-//       },
-//     );
-//
-// // ___________________________________card_view_______________________________________
-//
-// Widget petCard(
-//     {required String imgBase64,
-//     required String petname,
-//     required String energyLevel,
-//     required String petdetails,
-//     required void Function()? ontap,
-//     required BuildContext context}) {
-//   Uint8List? img;
-//   try {
-//     img = base64Decode(imgBase64);
-//   } catch (e) {
-//     print('Error decoding image: $e');
-//   }
-//
-//   return InkWell(
-//     onTap: ontap,
-//     child: Card(
-//       color: Colors.white,
-//       elevation: 10,
-//       shadowColor: Colors.grey,
-//       child: Row(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           SizedBox(
-//             height: 100,
-//             width: 100,
-//             child: img != null
-//                 ? Image.memory(img, fit: BoxFit.cover)
-//                 : const Placeholder(),
-//           ),
-//           const SizedBox(width: 8),
-//           Expanded(
-//             child: Padding(
-//               padding: const EdgeInsets.symmetric(vertical: 8.0),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                   Text(
-//                     petname,
-//                     style: const TextStyle(
-//                         fontSize: 18, fontWeight: FontWeight.w600),
-//                   ),
-//                   const SizedBox(height: 8),
-//                   Text(
-//                     energyLevel,
-//                     style: const TextStyle(fontSize: 16),
-//                   ),
-//                   const SizedBox(height: 8),
-//                   Flexible(
-//                     fit: FlexFit.loose,
-//                     child: SingleChildScrollView(
-//                       child: Text(
-//                         maxLines: 2,
-//                         petdetails,
-//                         style: const TextStyle(fontSize: 16),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(10),
-//             child: deleteIcon(
-//                 context: context,
-//                 petName: petname,
-//                 deletePet: () async {
-//                   await deletePet(petname: petname);
-//                 }),
-//           )
-//         ],
-//       ),
-//     ),
-//   );
-// }
-//
-// Future<void> deletePet({required String petname}) async {
-//   final petId = petname;
-//   await FirebaseFirestore.instance
-//       .collection('categories')
-//       .doc('Dog')
-//       .collection('List')
-//       .doc(petId)
-//       .delete();
-// }
+Widget workoutImg({
+  required void Function() onTap,
+  required String text,
+  String? selectedImage,
+}) =>
+    InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 170,
+        height: 140,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3), // changes position of shadow
+            ),
+          ],
+        ),
+        child: selectedImage != null
+            ? Image.network(
+                selectedImage,
+                fit: BoxFit.cover,
+              )
+            : Padding(
+                padding: const EdgeInsets.all(20),
+                child: Center(
+                  child: Text(
+                    text,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ), // Placeholder icon
+              ),
+      ),
+    );

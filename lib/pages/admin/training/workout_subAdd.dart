@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
-import 'admin_functions/petImg.dart';
+import '../admin_functions/petImg.dart';
 
 class NewWorkout extends StatefulWidget {
   const NewWorkout({Key? key}) : super(key: key);
@@ -22,7 +22,7 @@ class _NewWorkoutState extends State<NewWorkout> {
   String selectedCategory = '';
   List<String> dropdownValues = [];
   String? selectedValue;
-  late String MainImage;
+  late String mainImage;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +42,6 @@ class _NewWorkoutState extends State<NewWorkout> {
                 text: "add a img",
                 onTap: () async {
                   imagepicker();
-                  // setState(() {
-                  //   _selectedImage = MainImage;
-                  // });
                 },
                 selectedImage: _selectedImage,
               ),
@@ -161,57 +158,18 @@ class _NewWorkoutState extends State<NewWorkout> {
     Reference referenceDirImagtoupload = referenceDirImage.child(filename);
     try {
       await referenceDirImagtoupload.putFile(File(file.path));
-      MainImage = await referenceDirImagtoupload.getDownloadURL();
+      mainImage = await referenceDirImagtoupload.getDownloadURL();
       setState(() {
-        _selectedImage = MainImage;
+        _selectedImage = mainImage;
       });
-      if (MainImage.isEmpty) {
+      if (mainImage.isEmpty) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('No Image Selected')));
+            .showSnackBar(const SnackBar(content: Text('No Image Selected')));
       }
     } catch (e) {
       print('Some Error Happened ?');
     }
   }
-
-  Widget workoutImg({
-    required void Function() onTap,
-    required String text,
-    String? selectedImage,
-  }) =>
-      InkWell(
-        onTap: onTap,
-        child: Container(
-          width: 170,
-          height: 140,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3), // changes position of shadow
-              ),
-            ],
-          ),
-          child: selectedImage != null
-              ? Image.network(
-                  selectedImage,
-                  fit: BoxFit.cover,
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Center(
-                    child: Text(
-                      text,
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  ), // Placeholder icon
-                ),
-        ),
-      );
 
   Widget dropDownList(String? category) {
     if (category == null || category.isEmpty) {
@@ -281,7 +239,7 @@ class _NewWorkoutState extends State<NewWorkout> {
     String workoutName = workoutNameController.text;
     String details = detailsController.text;
     String time = timeController.text;
-    String? imgPath = MainImage; // Retrieve image path
+    String? imgPath = mainImage; // Retrieve image path
 
     // Use the selected dropdown value as the document ID
     String selectedValue =

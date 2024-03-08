@@ -24,7 +24,7 @@ class Root extends StatelessWidget {
                 height: 15,
               ),
               button(
-                  text: 'Sing in',
+                  text: 'Sign in',
                   ontap: () {
                     Navigator.pushNamed(context, '/register');
                   }),

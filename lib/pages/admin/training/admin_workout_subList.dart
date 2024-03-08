@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pawskills/pages/admin/admin_functions/training_function/workout_functions.dart';
+import 'package:pawskills/pages/admin/training/workout_details.dart';
 
 class WorkoutSubList extends StatefulWidget {
-  final String? workoutName;
-  final String? energyLevel;
+  final String workoutName;
+  final String energyLevel;
 
-  WorkoutSubList({super.key, this.workoutName, this.energyLevel});
+  WorkoutSubList(
+      {super.key, required this.workoutName, required this.energyLevel});
 
   @override
   State<WorkoutSubList> createState() => _WorkoutSubListState();
@@ -20,7 +22,7 @@ class _WorkoutSubListState extends State<WorkoutSubList> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('$widget.workoutName'),
+        title: Text(widget.workoutName),
         backgroundColor: Colors.grey[200],
       ),
       body: Padding(
@@ -59,7 +61,17 @@ class _WorkoutSubListState extends State<WorkoutSubList> {
                     workoutImageUrl: img,
                     workoutName: workoutName,
                     workoutTime: workoutTime,
-                    ontap: () {},
+                    ontap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => WorkoutDetails(
+                                workoutName: workoutName,
+                                imgUrl: img,
+                                details: workoutDetails,
+                                time: workoutTime),
+                          ));
+                    },
                     context: context,
                     delete: () {});
               },
@@ -72,23 +84,5 @@ class _WorkoutSubListState extends State<WorkoutSubList> {
         ),
       ),
     );
-  }
-
-  Future<void> _fetchWorkout() async {
-    try {
-      final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('WorkoutList')
-          .doc(widget.energyLevel)
-          .collection('List')
-          .doc(widget.workoutName)
-          .collection('subList')
-          .get();
-      setState(() {
-        workoutLists =
-            querySnapshot.docs.map((doc) => doc['subList'] as String).toList();
-      });
-    } catch (error) {
-      print('Error fetching categories: $error');
-    }
   }
 }
