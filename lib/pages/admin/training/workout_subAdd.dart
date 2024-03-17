@@ -7,7 +7,22 @@ import 'package:pawskills/pages/login/functions/Functions.dart';
 import '../admin_functions/petImg.dart';
 
 class NewWorkout extends StatefulWidget {
-  const NewWorkout({Key? key}) : super(key: key);
+  final String? workoutName;
+  final String? workoutDetails;
+  final String? workoutTime;
+  final String? workoutImgUrl;
+  final String? category;
+  final String? workoutList;
+
+  const NewWorkout(
+      {this.workoutName,
+      this.workoutDetails,
+      this.workoutImgUrl,
+      this.workoutTime,
+      this.category,
+      this.workoutList,
+      Key? key})
+      : super(key: key);
 
   @override
   _NewWorkoutState createState() => _NewWorkoutState();
@@ -15,14 +30,34 @@ class NewWorkout extends StatefulWidget {
 
 class _NewWorkoutState extends State<NewWorkout> {
   String? _selectedImage;
-  final workoutNameController = TextEditingController();
-  final detailsController = TextEditingController();
-  final timeController = TextEditingController();
+  late TextEditingController workoutNameController;
+  late TextEditingController detailsController;
+  late TextEditingController timeController;
+
   bool s1 = false, s2 = false, s3 = false;
   String selectedCategory = '';
   List<String> dropdownValues = [];
   String? selectedValue;
   late String mainImage;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    workoutNameController = TextEditingController(text: widget.workoutName);
+    detailsController = TextEditingController(text: widget.workoutDetails);
+    timeController = TextEditingController(text: widget.workoutTime);
+    _selectedImage = widget.workoutImgUrl;
+    selectedCategory = widget.category ?? '';
+    updateDropdownValues(selectedCategory);
+    if (widget.category == 'High') {
+      s1 = true;
+    } else if (widget.category == 'Medium') {
+      s2 = true;
+    } else if (widget.category == 'Low') {
+      s3 = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +74,7 @@ class _NewWorkoutState extends State<NewWorkout> {
           child: Column(
             children: [
               workoutImg(
-                text: "add a img",
+                text: "add an img",
                 onTap: () async {
                   imagepicker();
                 },
@@ -93,6 +128,30 @@ class _NewWorkoutState extends State<NewWorkout> {
     );
   }
 
+  void updateDropdownValues(String category) {
+    if (category.isNotEmpty) {
+      FirebaseFirestore.instance
+          .collection('WorkoutList')
+          .doc(category)
+          .collection('List')
+          .get()
+          .then((snapshot) {
+        if (snapshot.docs.isNotEmpty) {
+          setState(() {
+            dropdownValues = snapshot.docs.map((doc) => doc.id).toList();
+            selectedValue =
+                dropdownValues.isNotEmpty ? dropdownValues.first : null;
+          });
+        }
+      });
+    } else {
+      setState(() {
+        dropdownValues.clear();
+        selectedValue = null;
+      });
+    }
+  }
+
   Widget buildSwitch(String label, bool value) {
     return Row(
       children: [
@@ -103,40 +162,36 @@ class _NewWorkoutState extends State<NewWorkout> {
           activeColor: Colors.green,
           onChanged: (bool newValue) {
             setState(() {
-              s1 = label == 'High' ? newValue : false;
-              s2 = label == 'Medium' ? newValue : false;
-              s3 = label == 'Low' ? newValue : false;
-              if (newValue) {
-                selectedCategory = label;
-              } else {
-                selectedCategory = '';
+              if (label == 'High') {
+                s1 = newValue;
+                if (newValue) {
+                  selectedCategory = 'High';
+                  s2 = false;
+                  s3 = false;
+                } else if (!s2 && !s3) {
+                  selectedCategory = '';
+                }
+              } else if (label == 'Medium') {
+                s2 = newValue;
+                if (newValue) {
+                  selectedCategory = 'Medium';
+                  s1 = false;
+                  s3 = false;
+                } else if (!s1 && !s3) {
+                  selectedCategory = '';
+                }
+              } else if (label == 'Low') {
+                s3 = newValue;
+                if (newValue) {
+                  selectedCategory = 'Low';
+                  s1 = false;
+                  s2 = false;
+                } else if (!s1 && !s2) {
+                  selectedCategory = '';
+                }
               }
-              // Fetch and update the dropdownValues list based on the selected category
-              if (selectedCategory.isNotEmpty) {
-                FirebaseFirestore.instance
-                    .collection('WorkoutList')
-                    .doc(selectedCategory)
-                    .collection('List')
-                    .get()
-                    .then((snapshot) {
-                  if (snapshot.docs.isNotEmpty) {
-                    setState(() {
-                      dropdownValues =
-                          snapshot.docs.map((doc) => doc.id).toList();
-                      // Update the selectedValue if necessary
-                      selectedValue = dropdownValues.isNotEmpty
-                          ? dropdownValues.first
-                          : null;
-                    });
-                  }
-                });
-              } else {
-                // If no category is selected, clear the dropdownValues list
-                setState(() {
-                  dropdownValues.clear();
-                  selectedValue = null;
-                });
-              }
+              // Update the dropdownValues list based on the selected category
+              updateDropdownValues(selectedCategory);
             });
           },
         ),
@@ -239,7 +294,9 @@ class _NewWorkoutState extends State<NewWorkout> {
     String workoutName = workoutNameController.text;
     String details = detailsController.text;
     String time = timeController.text;
-    String? imgPath = mainImage; // Retrieve image path
+    String? imgPath = _selectedImage;
+    String? category = selectedCategory;
+    String? selectedList = dropdownValues.first.toString();
 
     // Use the selected dropdown value as the document ID
     String selectedValue =
@@ -250,19 +307,45 @@ class _NewWorkoutState extends State<NewWorkout> {
     }
 
     // Save data to Firestore
+    final databaseRef = FirebaseFirestore.instance;
+    final workoutCollectionRef = databaseRef
+        .collection('WorkoutList')
+        .doc(selectedCategory)
+        .collection('List')
+        .doc(selectedValue);
+    final workoutCollection =
+        workoutCollectionRef.collection('subList').doc(workoutName);
+
+    final workoutData = {
+      'workoutName': workoutName,
+      'details': details,
+      'time': time,
+      'img': imgPath,
+      'category': category,
+      'selectedList': selectedList
+    };
+
     try {
-      await FirebaseFirestore.instance
-          .collection('WorkoutList')
-          .doc(selectedCategory) // Use selected category as parent document ID
-          .collection('List')
-          .doc(selectedValue) // Use selected dropdown value as the document ID
-          .collection('subList')
-          .doc(workoutName)
-          .set({
-        'workoutName': workoutName,
-        'details': details,
-        'time': time,
-        'img': imgPath, // Store image path if available
+      // Check if the workout already exists
+      final existingWorkDoc = await workoutCollection.get();
+      if (existingWorkDoc.exists) {
+        // Update the existing document
+        await workoutCollection.update(workoutData);
+      } else {
+        // Create a new document
+        await workoutCollection.set(workoutData);
+      }
+      workoutNameController.clear();
+      detailsController.clear();
+      timeController.clear();
+      setState(() {
+        _selectedImage = '';
+        selectedCategory = '';
+        dropdownValues.clear();
+        selectedValue = '';
+        s1 = false;
+        s2 = false;
+        s3 = false;
       });
 
       print('Workout saved successfully');

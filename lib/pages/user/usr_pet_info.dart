@@ -1,12 +1,10 @@
-import 'dart:convert';
-import 'dart:typed_data';
-import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/widgets.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
 import 'package:pawskills/pages/user/functions/main_functios_user.dart';
+import 'package:pawskills/pages/user/user_training/training_home.dart';
 
 class UserPetInfo extends StatefulWidget {
   final String imgBase64;
@@ -41,13 +39,7 @@ class _UserPetInfoState extends State<UserPetInfo> {
 
   @override
   Widget build(BuildContext context) {
-    Uint8List? imageBytes;
-    try {
-      imageBytes = base64Decode(widget.detailImage);
-    } catch (e) {
-      print('Error decoding image: $e');
-    }
-
+    String detailImage = widget.detailImage;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -62,8 +54,11 @@ class _UserPetInfoState extends State<UserPetInfo> {
                   height: 300,
                   child: AspectRatio(
                     aspectRatio: 16 / 13, // Maintain image aspect ratio
-                    child: imageBytes != null
-                        ? Image.memory(imageBytes, fit: BoxFit.cover)
+                    child: detailImage.isNotEmpty
+                        ? CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl: detailImage,
+                          )
                         : const Placeholder(),
                   ),
                 ),
@@ -150,7 +145,18 @@ class _UserPetInfoState extends State<UserPetInfo> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                button(text: 'Training', ontap: () {}, width: 350)
+                button(
+                    text: 'Training',
+                    ontap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserWorkoutList(
+                              energyLevel: widget.energyLevel,
+                            ),
+                          ));
+                    },
+                    width: 350)
               ],
             ),
           ),

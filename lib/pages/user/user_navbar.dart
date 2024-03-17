@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pawskills/pages/user/uder_profile.dart';
 import 'package:pawskills/pages/user/user_home.dart';
-import 'package:pawskills/pages/user/user_profile.dart';
 import 'package:pawskills/pages/user/user_wishlist.dart';
 
 class UserNavbar extends StatefulWidget {
@@ -66,7 +66,7 @@ class _UserNavbarState extends State<UserNavbar> {
       case 1:
         return const UserWishlist();
       case 2:
-        return const UserProf();
+        return const UserProfile();
       default:
         return const SizedBox(); // Handle any other case
     }

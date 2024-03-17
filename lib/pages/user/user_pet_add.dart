@@ -4,10 +4,14 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
 import 'package:pawskills/pages/login/functions/formfield.dart';
 import '../admin/admin_functions/petImg.dart';
+import 'functions/hive/user_hive.dart';
+import 'functions/main_functios_user.dart';
 
 class UserPet extends StatefulWidget {
   const UserPet({super.key});
@@ -24,11 +28,11 @@ class _UserPetState extends State<UserPet> {
   final heightController = TextEditingController();
   final energyLevelController = TextEditingController();
 
-  File? listPhoto; // Image for the list-photo field
-  File? detailsPhoto; // Image for the Details-photo field
+  File? listPhoto;
+  File? detailsPhoto;
 
-  String? listPhotoBase64; // Base64 string for the list-photo field
-  String? detailsPhotoBase64; // Base64 string for the Details-photo field
+  String? listPhotoBase64;
+  String? detailsPhotoBase64;
 
   @override
   Widget build(BuildContext context) {
@@ -49,14 +53,14 @@ class _UserPetState extends State<UserPet> {
               children: <Widget>[
                 Row(
                   children: [
-                    petImg(
+                    usrPetImg(
                         text: 'list-photo',
                         selectimg: listPhotoBase64,
                         ontap: () async {
                           await _getImage(context: context, forListPhoto: true);
                         }),
                     const SizedBox(width: 8),
-                    petImg(
+                    usrPetImg(
                         text: 'Details-photo',
                         selectimg: detailsPhotoBase64,
                         ontap: () async {
@@ -113,7 +117,7 @@ class _UserPetState extends State<UserPet> {
                 button(
                     text: 'Save',
                     ontap: () async {
-                      await _uploadPetDetailsToFirebase();
+                      await _savePetData();
                     },
                     width: 350)
               ],
@@ -162,35 +166,16 @@ class _UserPetState extends State<UserPet> {
       child: Text(text,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)));
 
-  // ____________________________save_Firebase__________________________________
-
-  Future<void> _uploadPetDetailsToFirebase() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      print('User is not authenticated.');
-      return;
-    }
-
-    final databaseRef = FirebaseFirestore.instance;
-    final userPetsCollectionRef =
-        databaseRef.collection('user_pets').doc(user.uid).collection('pets');
-
-    // Store data in a Map
-    final petData = {
-      'petName': petNameController.text,
-      'petDetails': petDetailsController.text,
-      'gender': genderController.text,
-      'weight': weightController.text,
-      'height': heightController.text,
-      'energyLevel': energyLevelController.text,
-      'listPhoto': listPhotoBase64, // Store both image base64 strings
-      'detailsPhoto': detailsPhotoBase64, // Store image as base64 string
-    };
-
+  // __________________________save_data___________________________________________
+  Future<void> _savePetData() async {
     try {
-      // Use add method to automatically generate a unique document ID
-      await userPetsCollectionRef.add(petData);
+      // Save data to Firebase
+      await _uploadPetDetailsToFirebase();
 
+      // Save data to Hive
+      await _saveDataToHive();
+      Navigator.pop(context);
+      // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Pet details saved successfully!'),
@@ -209,12 +194,77 @@ class _UserPetState extends State<UserPet> {
         detailsPhotoBase64 = null;
       });
     } catch (error) {
-      print('Error saving pet details to Firebase: $error');
+      // Handle errors
+      print('Error saving pet details: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('An error occurred. Please try again later.'),
         ),
       );
     }
+  }
+
+  // ____________________________save_Firebase__________________________________
+
+  Future<void> _uploadPetDetailsToFirebase() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      print('User is not authenticated.');
+      throw Exception('User is not authenticated.');
+    }
+    final databaseRef = FirebaseFirestore.instance;
+    final userId = user.uid;
+    final userPetsCollectionRef = databaseRef
+        .collection('users')
+        .doc(userId)
+        .collection('wishlist')
+        .doc('user_pet')
+        .collection('List');
+
+    // Store data in a Map
+    final petData = {
+      'petName': petNameController.text,
+      'petDetails': petDetailsController.text,
+      'gender': genderController.text,
+      'weight': weightController.text,
+      'height': heightController.text,
+      'energyLevel': energyLevelController.text,
+      'listPhoto': listPhotoBase64,
+      'detailsPhoto': detailsPhotoBase64,
+    };
+    final docRef = await userPetsCollectionRef.add(petData);
+    final petId = docRef.id;
+    await docRef.update({'petName': petId});
+  }
+
+  // Function to save pet data into Hive
+  Future<void> _saveDataToHive() async {
+    // Initialize Hive and get the application documents directory
+    final appDocumentDir = await getApplicationDocumentsDirectory();
+    Hive.init(appDocumentDir.path);
+
+    // Register adapter for PetData class
+    if (!Hive.isAdapterRegistered(2)) {
+      // Register adapter for PetData class
+      Hive.registerAdapter(PetDataAdapter());
+    }
+
+    // Open a Hive box
+    final box = await Hive.openBox<PetData>('user_pets');
+
+    // Create a new PetData object
+    final petData = PetData(
+      petName: petNameController.text,
+      petDetails: petDetailsController.text,
+      gender: genderController.text,
+      weight: weightController.text,
+      height: heightController.text,
+      energyLevel: energyLevelController.text,
+      listPhotoBase64: listPhotoBase64,
+      detailsPhotoBase64: detailsPhotoBase64,
+    );
+
+    // Save the pet data into the Hive box
+    await box.add(petData);
   }
 }

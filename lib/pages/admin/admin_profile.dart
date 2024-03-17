@@ -4,8 +4,10 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../admin/admin_functions/petImg.dart';
 
 class AdminProf extends StatefulWidget {
@@ -25,7 +27,7 @@ class _AdminProfState extends State<AdminProf> {
   @override
   void initState() {
     super.initState();
-    // Fetch existing user data from Firestore and populate the text controllers
+    // Fetch existing user data from Firestore
     fetchUserData();
   }
 
@@ -43,7 +45,7 @@ class _AdminProfState extends State<AdminProf> {
           IconButton(
             icon: const Icon(Icons.exit_to_app),
             onPressed: () {
-              _signOut(context);
+              _kickOut(context);
             },
           ),
         ],
@@ -160,17 +162,43 @@ class _AdminProfState extends State<AdminProf> {
   Future<void> _signOut(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      // Navigate to the login screen after signing out
-      Navigator.pushReplacementNamed(context, '/login');
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('Pass');
+      await prefs.remove('User');
+      await prefs.remove('role');
+
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     } catch (e) {
       print('Error signing out: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Failed to sign out. Please try again.'),
         ),
       );
     }
   }
+
+  void _kickOut(context) => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            'Exit',
+            style: GoogleFonts.spaceGrotesk(
+              textStyle: const TextStyle(color: Colors.red),
+            ),
+          ),
+          content: const Text('Do you want to exit'),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('No')),
+            TextButton(
+                onPressed: () => _signOut(context), child: const Text('Yes'))
+          ],
+        ),
+      );
 
   void _saveChanges() async {
     final User? user = FirebaseAuth.instance.currentUser;

@@ -1,6 +1,4 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +23,7 @@ class _PetListViewState extends State<PetListView> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
@@ -42,14 +40,14 @@ class _PetListViewState extends State<PetListView> {
             final petname = category['petName'];
             final energyLevel = category['energyLevel'];
             final petdetails = category['petDetails'];
-            final life_expectancy = category['life_expectancy'];
+            final lifeExpectancy = category['life_expectancy'];
             final detailsPhoto = category['detailsPhoto'];
             final avgheight = category['height'];
             final avgweight = category['weight'];
 
             return petCard(
               context: context,
-              imgBase64: img,
+              listimg: img,
               petname: petname,
               energyLevel: energyLevel,
               petdetails: petdetails,
@@ -61,7 +59,7 @@ class _PetListViewState extends State<PetListView> {
                           petName: petname,
                           energyLevel: energyLevel,
                           petDetails: petdetails,
-                          lifeExpectancy: life_expectancy,
+                          lifeExpectancy: lifeExpectancy,
                           avgHeight: avgheight,
                           avgWeight: avgweight,
                         )));
@@ -76,32 +74,24 @@ class _PetListViewState extends State<PetListView> {
     );
   }
 
-  Future<void> deletePet({required String petname}) async {
-    final petId = petname;
+  Future<void> deletePet({required String petName}) async {
+    final petId = petName;
     await FirebaseFirestore.instance
         .collection('categories')
         .doc('Dog')
         .collection('List')
         .doc(petId)
         .delete();
-    print(petId);
   }
 
   Widget petCard({
-    required String imgBase64,
+    required String listimg,
     required String petname,
     required String energyLevel,
     required String petdetails,
     required void Function()? ontap,
     required BuildContext context,
   }) {
-    Uint8List? img;
-    try {
-      img = base64Decode(imgBase64);
-    } catch (e) {
-      print('Error decoding image: $e');
-    }
-
     return InkWell(
       onTap: ontap,
       child: Card(
@@ -116,8 +106,11 @@ class _PetListViewState extends State<PetListView> {
               child: SizedBox(
                 height: 110,
                 width: 110,
-                child: img != null
-                    ? Image.memory(img, fit: BoxFit.cover)
+                child: listimg.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: listimg,
+                        fit: BoxFit.cover,
+                      )
                     : const Placeholder(),
               ),
             ),
@@ -160,7 +153,7 @@ class _PetListViewState extends State<PetListView> {
                 context: context,
                 petName: petname,
                 deletePet: () {
-                  deletePet(petname: petname);
+                  deletePet(petName: petname);
                   setState(() {});
                 },
               ),

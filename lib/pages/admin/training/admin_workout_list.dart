@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pawskills/pages/admin/admin_functions/admin_function.dart';
 import '../admin_functions/training_function/add_trainig_list.dart';
-import 'admin_workout_subList.dart';
+import 'admin_workout_sublist.dart';
 
 class WorkoutList extends StatefulWidget {
   const WorkoutList({Key? key}) : super(key: key);

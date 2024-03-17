@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:pawskills/pages/admin/training/workout_subAdd.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
-class WorkoutDetails extends StatefulWidget {
+class UserWorkoutDetails extends StatefulWidget {
   final String workoutName;
   final String imgUrl;
   final String details;
@@ -13,7 +12,7 @@ class WorkoutDetails extends StatefulWidget {
   final String? workoutList;
   final String? category;
 
-  const WorkoutDetails({
+  const UserWorkoutDetails({
     required this.workoutName,
     required this.imgUrl,
     required this.details,
@@ -24,10 +23,10 @@ class WorkoutDetails extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<WorkoutDetails> createState() => _WorkoutDetailsState();
+  State<UserWorkoutDetails> createState() => _UserWorkoutDetailsState();
 }
 
-class _WorkoutDetailsState extends State<WorkoutDetails> {
+class _UserWorkoutDetailsState extends State<UserWorkoutDetails> {
   late int initialSeconds;
   int secondsRemaining = 0;
   bool isPaused = false;
@@ -51,32 +50,10 @@ class _WorkoutDetailsState extends State<WorkoutDetails> {
         ),
         centerTitle: true,
         backgroundColor: Colors.grey[200],
-        elevation: 0,
-        // Remove elevation
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NewWorkout(
-                    workoutName: widget.workoutName,
-                    workoutDetails: widget.details,
-                    workoutImgUrl: widget.imgUrl,
-                    workoutTime: widget.time,
-                    category: widget.category,
-                    workoutList: widget.workoutList,
-                  ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.edit,
-                color: Colors.black87), // Adjust icon color
-          )
-        ],
+        elevation: 1,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0), // Adjust padding
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -114,32 +91,48 @@ class _WorkoutDetailsState extends State<WorkoutDetails> {
               ),
             ),
             const SizedBox(height: 20),
-            Countdown(
-              controller: _controller,
-              seconds: secondsRemaining,
-              build: (BuildContext context, double time) {
-                final remaining = time.toInt();
-                secondsRemaining = remaining;
-                return Text(
-                  '${(remaining ~/ 60).toString().padLeft(2, '0')}:${(remaining % 60).toString().padLeft(2, '0')}',
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black, // Change color
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  height: 150,
+                  width: 150,
+                  child: CircularProgressIndicator(
+                    value: secondsRemaining / initialSeconds,
+                    strokeWidth: 10,
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.black),
+                    backgroundColor: Colors.grey[300],
                   ),
-                );
-              },
-              interval: const Duration(seconds: 1),
-              onFinished: () {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Timer finished!'),
-                    ),
-                  );
-                });
-                Navigator.pop(context);
-              },
+                ),
+                Countdown(
+                  controller: _controller,
+                  seconds: secondsRemaining,
+                  build: (BuildContext context, double time) {
+                    final remaining = time.toInt();
+                    secondsRemaining = remaining;
+                    return Text(
+                      '${(remaining ~/ 60).toString().padLeft(2, '0')}:${(remaining % 60).toString().padLeft(2, '0')}',
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    );
+                  },
+                  interval: const Duration(seconds: 1),
+                  onFinished: () {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Timer finished!'),
+                        ),
+                      );
+                    });
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Row(
@@ -153,12 +146,12 @@ class _WorkoutDetailsState extends State<WorkoutDetails> {
                       _controller.pause();
                     }
                     setState(() {
-                      isPaused = !isPaused; // Toggle pause state
+                      isPaused = !isPaused;
                     });
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        Colors.blue[800]), // Change button color
+                    backgroundColor:
+                        MaterialStateProperty.all(Colors.blue[800]),
                   ),
                   child: Text(
                     isPaused ? 'Resume' : 'Pause',
@@ -175,8 +168,8 @@ class _WorkoutDetailsState extends State<WorkoutDetails> {
                     });
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        Colors.cyan[600]), // Change button color
+                    backgroundColor:
+                        MaterialStateProperty.all(Colors.cyan[600]),
                   ),
                   child: const Text(
                     'Restart',

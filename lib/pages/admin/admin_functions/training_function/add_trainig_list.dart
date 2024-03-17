@@ -278,7 +278,7 @@ Widget workoutCard({
             child: Column(
               children: [
                 editButton(width: 35, height: 35, ontap: edit, icon_size: 18),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 deleteButton(
                     width: 35, height: 35, ontap: delete, icon_size: 18),
               ],

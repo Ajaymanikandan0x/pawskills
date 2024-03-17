@@ -1,7 +1,6 @@
-import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
@@ -12,9 +11,9 @@ class AddNewPet extends StatefulWidget {
   final String? petName;
   final String? petDetails;
   final String? lifeExpectancy;
-  final String? energyLevel;
-  final String? listPhotoBase64;
-  final String? detailsPhotoBase64;
+  final String? selectedEnergyLevel;
+  final String? listPhoto;
+  final String? detailsPhoto;
   final String? avgheight;
   final String? avgweight;
 
@@ -23,9 +22,9 @@ class AddNewPet extends StatefulWidget {
       this.petName,
       this.petDetails,
       this.lifeExpectancy,
-      this.energyLevel,
-      this.listPhotoBase64,
-      this.detailsPhotoBase64,
+      this.selectedEnergyLevel,
+      this.listPhoto,
+      this.detailsPhoto,
       this.avgheight,
       this.avgweight})
       : super(key: key);
@@ -38,15 +37,12 @@ class _AddBewPetState extends State<AddNewPet> {
   final petNameController = TextEditingController();
   final petDetailsController = TextEditingController();
   final temperamentController = TextEditingController();
-  final energyLevelController = TextEditingController();
   final avgHeightController = TextEditingController();
   final avgWeightController = TextEditingController();
+  String? selectedEnergyLevel;
 
-  File? listPhoto; // Image for the list-photo field
-  File? detailsPhoto; // Image for the Details-photo field
-
-  String? listPhotoBase64; // Base64 string for the list-photo field
-  String? detailsPhotoBase64; // Base64 string for the Details-photo field
+  String? listPhoto;
+  String? detailsPhoto;
 
   @override
   void initState() {
@@ -60,8 +56,8 @@ class _AddBewPetState extends State<AddNewPet> {
     if (widget.lifeExpectancy != null) {
       temperamentController.text = widget.lifeExpectancy!;
     }
-    if (widget.energyLevel != null) {
-      energyLevelController.text = widget.energyLevel!;
+    if (widget.selectedEnergyLevel != null) {
+      selectedEnergyLevel = widget.selectedEnergyLevel!;
     }
     if (widget.avgweight != null) {
       avgWeightController.text = widget.avgweight!;
@@ -69,8 +65,8 @@ class _AddBewPetState extends State<AddNewPet> {
     if (widget.avgheight != null) {
       avgHeightController.text = widget.avgheight!;
     }
-    listPhotoBase64 = widget.listPhotoBase64;
-    detailsPhotoBase64 = widget.detailsPhotoBase64;
+    listPhoto = widget.listPhoto;
+    detailsPhoto = widget.detailsPhoto;
   }
 
   @override
@@ -94,17 +90,16 @@ class _AddBewPetState extends State<AddNewPet> {
                   children: [
                     petImg(
                         text: 'list-photo',
-                        selectimg: listPhotoBase64,
+                        selectimg: listPhoto,
                         ontap: () async {
-                          await _getImage(context: context, forListPhoto: true);
+                          _getImage(isListPhoto: true);
                         }),
                     const SizedBox(width: 8),
                     petImg(
                         text: 'Details-photo',
-                        selectimg: detailsPhotoBase64,
+                        selectimg: detailsPhoto,
                         ontap: () async {
-                          await _getImage(
-                              context: context, forListPhoto: false);
+                          _getImage(isListPhoto: false);
                         })
                   ],
                 ),
@@ -128,13 +123,54 @@ class _AddBewPetState extends State<AddNewPet> {
                     hintText: 'Details'),
                 const SizedBox(height: 15),
                 _text(
-                  'Complete Profile',
+                  'Select the value',
                 ),
-                const SizedBox(height: 25),
-                form_field(
-                    Hint_text: 'Energy Level',
-                    controller: energyLevelController,
-                    inputIcon: const Icon(Icons.upgrade_outlined)),
+                const SizedBox(height: 10),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedEnergyLevel,
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              selectedEnergyLevel = newValue;
+                            });
+                          }
+                        },
+                        items: <String>['High', 'Medium', 'Low']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(
+                                fontSize: 22,
+                                color: value == 'Select'
+                                    ? Colors.grey
+                                    : Colors.black,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        icon: const Icon(Icons.arrow_drop_down,
+                            color: Colors.black),
+                        elevation: 8,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          color: Colors.black,
+                        ),
+                        isExpanded: true,
+                        dropdownColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 10),
                 form_field(
                     Hint_text: 'Life Expectancy',
@@ -167,36 +203,32 @@ class _AddBewPetState extends State<AddNewPet> {
 
   // _____________________take_img_in_localStorage______________________________
 
-  Future<void> _getImage(
-      {required bool forListPhoto, required BuildContext context}) async {
+  void _getImage({required bool isListPhoto}) async {
+    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (file == null) {
+      return;
+    }
+    String filename = DateTime.now().microsecondsSinceEpoch.toString();
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImage = referenceRoot.child('Pet_breed_imgg');
+    Reference referenceDirImagtoupload = referenceDirImage.child(filename);
     try {
-      final picker = ImagePicker();
-      final XFile? imageselect =
-          await picker.pickImage(source: ImageSource.gallery);
-
-      if (imageselect == null) {
-        return; // Handle image selection cancellation gracefully
-      }
-
-      Uint8List imageBytes = await imageselect.readAsBytes();
-      String base64Image = base64Encode(imageBytes);
+      await referenceDirImagtoupload.putFile(File(file.path));
+      String uploadedImageUrl = await referenceDirImagtoupload.getDownloadURL();
 
       setState(() {
-        if (forListPhoto) {
-          listPhoto = File(imageselect.path);
-          listPhotoBase64 = base64Image;
+        if (isListPhoto) {
+          listPhoto = uploadedImageUrl;
         } else {
-          detailsPhoto = File(imageselect.path);
-          detailsPhotoBase64 = base64Image;
+          detailsPhoto = uploadedImageUrl;
         }
       });
-    } catch (error) {
-      print("Error picking image: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An error occurred while selecting an image.'),
-        ),
-      );
+      if (uploadedImageUrl.isEmpty) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('No Image Selected')));
+      }
+    } catch (e) {
+      print('Some Error Happened ? $e');
     }
   }
 
@@ -219,9 +251,9 @@ class _AddBewPetState extends State<AddNewPet> {
       'life_expectancy': temperamentController.text,
       'weight': avgWeightController.text,
       'height': avgHeightController.text,
-      'energyLevel': energyLevelController.text,
-      'listPhoto': listPhotoBase64, // Store both image base64 strings
-      'detailsPhoto': detailsPhotoBase64, // Store image as base64 string
+      'energyLevel': selectedEnergyLevel,
+      'listPhoto': listPhoto, // Store both image base64 strings
+      'detailsPhoto': detailsPhoto, // Store image as base64 string
     };
 
     try {
@@ -248,10 +280,11 @@ class _AddBewPetState extends State<AddNewPet> {
       temperamentController.clear();
       avgWeightController.clear();
       avgHeightController.clear();
-      energyLevelController.clear();
+
       setState(() {
-        listPhotoBase64 = null;
-        detailsPhotoBase64 = null;
+        selectedEnergyLevel = '';
+        listPhoto = '';
+        detailsPhoto = '';
       });
     } catch (error) {
       print('Error saving pet details to Firebase: $error');

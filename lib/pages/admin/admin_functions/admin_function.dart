@@ -247,9 +247,9 @@ Widget deleteIcon(
 // ___________________________________delete____________________________________
 
 Widget deleteButton(
-        {double height = 30,
-        double? width = 30,
-        double icon_size = 10,
+        {double height = 40,
+        double? width = 40,
+        double icon_size = 20,
         void Function()? ontap}) =>
     InkWell(
       onTap: ontap,
@@ -271,5 +271,6 @@ Widget deleteButton(
           child: Icon(
             Icons.delete,
             size: icon_size,
+            color: Colors.red[700],
           )),
     );

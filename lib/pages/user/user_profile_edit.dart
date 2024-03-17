@@ -2,21 +2,25 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../admin/admin_functions/petImg.dart';
+import 'functions/hive/user_hive.dart';
 
-class UserProf extends StatefulWidget {
-  const UserProf({super.key});
+class UserProfEdit extends StatefulWidget {
+  const UserProfEdit({super.key});
 
   @override
-  State<UserProf> createState() => _UserProfState();
+  State<UserProfEdit> createState() => _UserProfEditState();
 }
 
-class _UserProfState extends State<UserProf> {
+class _UserProfEditState extends State<UserProfEdit> {
   final firstNameController = TextEditingController();
   final emailController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -40,14 +44,6 @@ class _UserProfState extends State<UserProf> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: () {
-              _signOut(context);
-            },
-          ),
-        ],
         backgroundColor: Colors.grey[200],
       ),
       body: SingleChildScrollView(
@@ -143,34 +139,62 @@ class _UserProfState extends State<UserProf> {
         ),
       );
 
-  Future<void> fetchUserData() async {
-    final User? user = FirebaseAuth.instance.currentUser;
-    final currentUserDocRef =
-        FirebaseFirestore.instance.collection('users').doc(user?.uid);
-    final snapshot = await currentUserDocRef.get();
-    if (snapshot.exists) {
-      setState(() {
-        firstNameController.text = snapshot.get('firstName') ?? '';
-        lastNameController.text = snapshot.get('lastName') ?? '';
-        emailController.text = snapshot.get('email') ?? '';
-        photoBase64 = snapshot.get('photo') ?? '';
-      });
-    }
+  Future<bool> _isConnected() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
   }
 
-  Future<void> _signOut(BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      // Navigate to the login screen after signing out
-      Navigator.pushReplacementNamed(context, '/login');
-    } catch (e) {
-      print('Error signing out: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to sign out. Please try again.'),
-        ),
-      );
-    }
+  void fetchUserData() {
+    FutureBuilder(
+      future: _isConnected().then((isConnected) async {
+        if (isConnected) {
+          final User? user = FirebaseAuth.instance.currentUser;
+          final currentUserDocRef =
+              FirebaseFirestore.instance.collection('users').doc(user?.uid);
+
+          try {
+            final snapshot = await currentUserDocRef.get();
+            if (snapshot.exists) {
+              setState(() {
+                firstNameController.text = snapshot.get('firstName') ?? '';
+                lastNameController.text = snapshot.get('lastName') ?? '';
+                emailController.text = snapshot.get('email') ?? '';
+                photoBase64 = snapshot.get('photo') ?? '';
+              });
+            }
+          } catch (error) {
+            print('Error fetching user data from Firestore: $error');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to fetch user data. Please try again.'),
+              ),
+            );
+          }
+        } else {
+          final userDataBox = Hive.box<UserProfileData>('user_profile_data');
+          final userProfileData = userDataBox.get('user_profile_data');
+
+          if (userProfileData != null) {
+            setState(() {
+              firstNameController.text = userProfileData.firstName;
+              lastNameController.text = userProfileData.lastName;
+              emailController.text = userProfileData.email;
+              photoBase64 = userProfileData.photoBase64;
+            });
+          }
+        }
+      }),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+        return snapshot.data ??
+            Container(); // Return an empty container if data is null
+      },
+    );
   }
 
   void _saveChanges() async {
@@ -196,6 +220,25 @@ class _UserProfState extends State<UserProf> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to update profile. Please try again.'),
+        ),
+      );
+    }
+    final userDataBox = Hive.box<UserProfileData>('user_profile_data');
+    try {
+      userDataBox.put(
+        'user_profile_data',
+        UserProfileData(
+          firstName: firstNameController.text,
+          lastName: lastNameController.text,
+          email: emailController.text,
+          photoBase64: photoBase64,
+        ),
+      );
+    } catch (error) {
+      print("Error updating profile in Hive: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to update profile in Hive. Please try again.'),
         ),
       );
     }

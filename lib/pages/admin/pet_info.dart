@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pawskills/pages/admin/admin_functions/admin_function.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
@@ -30,13 +29,6 @@ class AddPetInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Uint8List? imageBytes;
-    try {
-      imageBytes = base64Decode(detailImage);
-    } catch (e) {
-      print('Error decoding image: $e');
-    }
-
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -51,8 +43,11 @@ class AddPetInfo extends StatelessWidget {
                   height: 300,
                   child: AspectRatio(
                     aspectRatio: 16 / 13, // Maintain image aspect ratio
-                    child: imageBytes != null
-                        ? Image.memory(imageBytes, fit: BoxFit.cover)
+                    child: detailImage.isNotEmpty
+                        ? CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl: detailImage,
+                          )
                         : const Placeholder(),
                   ),
                 ),
@@ -120,9 +115,9 @@ class AddPetInfo extends StatelessWidget {
                                   petName: petName,
                                   petDetails: petDetails,
                                   lifeExpectancy: lifeExpectancy,
-                                  energyLevel: energyLevel,
-                                  listPhotoBase64: imgBase64,
-                                  detailsPhotoBase64: detailImage,
+                                  selectedEnergyLevel: energyLevel,
+                                  listPhoto: imgBase64,
+                                  detailsPhoto: detailImage,
                                 ),
                               ),
                             );

@@ -108,10 +108,18 @@ Widget workoutImg({
           ],
         ),
         child: selectedImage != null
-            ? Image.network(
-                selectedImage,
-                fit: BoxFit.cover,
-              )
+            ? Image.network(selectedImage, fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                return Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Center(
+                    child: Text(
+                      text,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                );
+              })
             : Padding(
                 padding: const EdgeInsets.all(20),
                 child: Center(
@@ -119,7 +127,7 @@ Widget workoutImg({
                     text,
                     style: const TextStyle(color: Colors.grey),
                   ),
-                ), // Placeholder icon
+                ),
               ),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'functions/Functions.dart';
 import 'functions/formfield.dart';
 
@@ -146,6 +147,14 @@ class UserLogin extends StatelessWidget {
 
         // Check user role
         final String userRole = userDataSnapshot.get('role');
+
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        if (email.isNotEmpty && password.isNotEmpty) {
+          prefs.setString('User', email);
+          prefs.setString('Pass', password);
+          prefs.setString('role', userRole);
+        }
 
         // Redirect based on user role
         if (userRole == 'admin') {

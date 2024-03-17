@@ -1,28 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:pawskills/pages/admin/admin_functions/training_function/workout_functions.dart';
-import 'package:pawskills/pages/admin/training/workout_details.dart';
+import 'package:pawskills/pages/user/user_training/user_workout_details.dart';
+import '../functions/trainig/trainig_functions.dart';
 
-class WorkoutSubList extends StatefulWidget {
+class UserWorkoutSubList extends StatelessWidget {
   final String workoutName;
   final String energyLevel;
 
-  WorkoutSubList(
-      {super.key, required this.workoutName, required this.energyLevel});
-
-  @override
-  State<WorkoutSubList> createState() => _WorkoutSubListState();
-}
-
-class _WorkoutSubListState extends State<WorkoutSubList> {
-  List<String> workoutLists = [];
+  const UserWorkoutSubList({
+    super.key,
+    required this.workoutName,
+    required this.energyLevel,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(widget.workoutName),
+        title: Text(workoutName),
         backgroundColor: Colors.grey[200],
       ),
       body: Padding(
@@ -30,9 +26,9 @@ class _WorkoutSubListState extends State<WorkoutSubList> {
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('WorkoutList')
-              .doc(widget.energyLevel)
+              .doc(energyLevel)
               .collection('List')
-              .doc(widget.workoutName)
+              .doc(workoutName)
               .collection('subList')
               .snapshots(),
           builder: (context, snapshot) {
@@ -53,27 +49,29 @@ class _WorkoutSubListState extends State<WorkoutSubList> {
                     documents[index].data() as Map<String, dynamic>;
                 final img = category['img'];
                 final workoutTime = category['time'];
-                final workoutName = category['workoutName'];
+                final subWorkoutName = category['workoutName'];
                 final workoutDetails = category['details'];
-                print('firebase image $img');
-
-                return workoutSubCard(
-                    workoutImageUrl: img,
-                    workoutName: workoutName,
-                    workoutTime: workoutTime,
-                    ontap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WorkoutDetails(
-                                workoutName: workoutName,
-                                imgUrl: img,
-                                details: workoutDetails,
-                                time: workoutTime),
-                          ));
-                    },
-                    context: context,
-                    delete: () {});
+                final workoutCategory = category['category'];
+                final workoutList = category['selectedList'];
+                return userWorkoutSubCard(
+                  workoutImageUrl: img,
+                  workoutName: subWorkoutName,
+                  workoutTime: workoutTime,
+                  ontap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserWorkoutDetails(
+                              workoutName: subWorkoutName,
+                              imgUrl: img,
+                              details: workoutDetails,
+                              time: workoutTime,
+                              category: workoutCategory,
+                              workoutList: workoutList),
+                        ));
+                  },
+                  context: context,
+                );
               },
               separatorBuilder: (BuildContext context, int index) =>
                   const SizedBox(

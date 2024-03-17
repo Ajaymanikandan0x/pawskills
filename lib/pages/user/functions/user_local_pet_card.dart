@@ -1,12 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:pawskills/pages/admin/admin_functions/admin_function.dart';
+import 'hive/user_hive.dart';
 
-import 'main_functios_user.dart';
-
-class PetCard extends StatefulWidget {
-  final String listImg;
+class LocalPetCard extends StatefulWidget {
+  final String imgBase64;
   final String petName;
   final String energyLevel;
   final String petdetails;
@@ -14,8 +16,8 @@ class PetCard extends StatefulWidget {
   final String? life_expectancy;
   final VoidCallback? onTap;
 
-  const PetCard({
-    required this.listImg,
+  const LocalPetCard({
+    required this.imgBase64,
     required this.petName,
     required this.energyLevel,
     required this.petdetails,
@@ -25,21 +27,19 @@ class PetCard extends StatefulWidget {
   });
 
   @override
-  _PetCardState createState() => _PetCardState();
+  _LocalPetCardState createState() => _LocalPetCardState();
 }
 
-class _PetCardState extends State<PetCard> {
-  bool isWished = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkWishlist();
-  }
-
+class _LocalPetCardState extends State<LocalPetCard> {
   @override
   Widget build(BuildContext context) {
-    String listimg = widget.listImg;
+    Uint8List? img;
+    try {
+      img = base64Decode(widget.imgBase64);
+    } catch (e) {
+      print('Error decoding image: $e');
+    }
+
     return InkWell(
       onTap: () {
         if (widget.onTap != null) {
@@ -59,11 +59,8 @@ class _PetCardState extends State<PetCard> {
               child: SizedBox(
                 height: 110,
                 width: 110,
-                child: listimg.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: listimg,
-                        fit: BoxFit.cover,
-                      )
+                child: img != null
+                    ? Image.memory(img, fit: BoxFit.cover)
                     : const Placeholder(),
               ),
             ),
@@ -102,13 +99,9 @@ class _PetCardState extends State<PetCard> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: wishButton(
-                isWished: isWished,
-                onTap: () {
-                  setState(() {
-                    isWished = isWished;
-                  });
-                  _toggleWishlist(widget.petName);
+              child: deleteButton(
+                ontap: () {
+                  _deleteData(widget.petName);
                 },
               ),
             )
@@ -118,54 +111,42 @@ class _PetCardState extends State<PetCard> {
     );
   }
 
-  void _toggleWishlist(String petName) async {
+  void _deleteData(String uid) async {
+    await deleteDataFromHive(uid);
+    await deleteDataFromFirestore(uid);
+    setState(() {});
+  }
+
+  Future<void> deleteDataFromFirestore(String uid) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
     final wishlistRef = FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
-        .collection('wishlist');
+        .collection('wishlist')
+        .doc('user_pet')
+        .collection('List');
 
     try {
-      if (isWished) {
-        await wishlistRef.doc(petName).delete();
-      } else {
-        await wishlistRef.doc(petName).set({
-          'petName': widget.petName,
-          'energyLevel': widget.energyLevel,
-          'petDetails': widget.petdetails,
-          'listPhoto': widget.listImg,
-          'life_expectancy': widget.life_expectancy,
-          'detailsPhoto': widget.detailsPhoto
-          // Add more fields as needed
-        });
-      }
-
-      setState(() {
-        // Update isWished after the Firestore operation completes
-        isWished = !isWished;
-        print(isWished);
-      });
+      await wishlistRef.doc(uid).delete();
+      print('Data with UID $uid deleted successfully from Firestore.');
     } catch (e) {
-      print('Error toggling wishlist: $e');
-      // Handle error here, e.g., show a snackbar or retry logic
+      print('Error deleting data from Firestore: $e');
     }
   }
 
-  Future<void> _checkWishlist() async {
-    try {
-      final userId = FirebaseAuth.instance.currentUser!.uid;
-      final wishlistDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('wishlist')
-          .doc(widget.petName)
-          .get();
+  Future<void> deleteDataFromHive(String petName) async {
+    // Open the Hive box
+    final box = await Hive.openBox<PetData>('user_pets');
 
-      setState(() {
-        isWished = wishlistDoc.exists;
-      });
-    } catch (e) {
-      print('Error checking wishlist: $e');
+    // Find the index of the item with the given petName
+    final index =
+        box.values.toList().indexWhere((data) => data.petName == petName);
+
+    if (index != -1) {
+      await box.deleteAt(index);
+      print('Data with petName $petName deleted from Hive.');
+    } else {
+      print('Data with petName $petName not found in Hive.');
     }
   }
 }

@@ -39,16 +39,16 @@ class _UserPetViewState extends State<UserPetView> {
             final petname = category['petName'];
             final energyLevel = category['energyLevel'];
             final petdetails = category['petDetails'];
-            final life_expectancy = category['life_expectancy'];
+            final lifeExpectancy = category['life_expectancy'];
             final detailsPhoto = category['detailsPhoto'];
 
             return PetCard(
-                imgBase64: img,
+                listImg: img,
                 petName: petname,
                 energyLevel: energyLevel,
                 petdetails: petdetails,
                 detailsPhoto: detailsPhoto,
-                life_expectancy: life_expectancy,
+                life_expectancy: lifeExpectancy,
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => UserPetInfo(
@@ -57,7 +57,7 @@ class _UserPetViewState extends State<UserPetView> {
                           petName: petname,
                           energyLevel: energyLevel,
                           petDetails: petdetails,
-                          lifeExpectancy: life_expectancy)));
+                          lifeExpectancy: lifeExpectancy)));
                 });
           },
           separatorBuilder: (BuildContext context, int index) => const SizedBox(

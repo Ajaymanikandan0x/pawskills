@@ -7,7 +7,7 @@ Widget workoutSubCard({
   required String workoutTime,
   required void Function()? ontap,
   required BuildContext context,
-  required void Function()? delete,
+  void Function()? delete,
 }) {
   return InkWell(
     onTap: ontap,
