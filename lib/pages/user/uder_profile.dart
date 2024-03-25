@@ -22,6 +22,7 @@ class _UserProfileState extends State<UserProfile> {
   String? firstName;
   String? lastName;
   String? email;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -103,7 +104,11 @@ class _UserProfileState extends State<UserProfile> {
                 child: Text(email ?? '', style: const TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 20),
-              Expanded(child: getPetData()),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : getPetData(),
+              ),
             ],
           ),
         ),
@@ -112,38 +117,44 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   Future<void> fetchUserData() async {
+    setState(() {
+      isLoading = true;
+    });
+
     final User? user = FirebaseAuth.instance.currentUser;
     final currentUserid =
         FirebaseFirestore.instance.collection('users').doc(user?.uid);
     final snapshot = await currentUserid.get();
-    if (await isConnected()) {
-      if (snapshot.exists) {
-        try {
-          final firstname = snapshot.get('firstName');
-          final userProf = snapshot.get('photo');
-          final lastname = snapshot.get('lastName');
-          final email_ = snapshot.get('email');
 
+    if (snapshot.exists) {
+      final firstname = snapshot.get('firstName');
+      final userProf = snapshot.get('photo');
+      final lastname = snapshot.get('lastName');
+      final email_ = snapshot.get('email');
+
+      setState(() {
+        profUrl = userProf;
+        firstName = firstname;
+        lastName = lastname;
+        email = email_;
+        isLoading = false;
+      });
+    }
+
+    if (!await isConnected()) {
+      try {
+        final box = await Hive.openBox<UserProfileData>('user_profile_data');
+        final profileData = box.get('user_profile_data');
+        if (profileData != null) {
           setState(() {
-            profUrl = userProf;
-            firstName = firstname;
-            lastName = lastname;
-            email = email_;
+            profUrl = profileData.photoBase64;
+            firstName = profileData.firstName;
+            lastName = profileData.lastName;
+            email = profileData.email;
           });
-        } catch (error) {
-          print("Error fetching user data: $error");
         }
-      }
-    } else {
-      final box = await Hive.openBox<UserProfileData>('user_profile_data');
-      final profileData = box.get('profile_data');
-      if (profileData != null) {
-        setState(() {
-          profUrl = profileData.photoBase64;
-          firstName = profileData.firstName;
-          lastName = profileData.lastName;
-          email = profileData.email;
-        });
+      } catch (error) {
+        print("Error fetching user data from Hive: $error");
       }
     }
   }

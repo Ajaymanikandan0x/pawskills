@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../usr_pet_info.dart';
 import '../hive/user_hive.dart';
 import '../user_local_pet_card.dart';
+import '../user_own_pet_details.dart';
 
 Future<bool> isConnected() async {
   var connectivityResult = await Connectivity().checkConnectivity();
@@ -71,7 +72,7 @@ Widget _getPetDataFromFirebase() => StreamBuilder<QuerySnapshot>(
                 petdetails: petdetails,
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => UserPetInfo(
+                      builder: (context) => UserOwnPetInfo(
                           imgBase64: img,
                           detailImage: detailsPhoto,
                           petName: petname,

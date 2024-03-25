@@ -97,6 +97,7 @@ class PetData {
 }
 
 // __________________________________user_pet_wishlist__________________________
+
 @HiveType(typeId: 3)
 class WishlistItem extends HiveObject {
   @HiveField(0)

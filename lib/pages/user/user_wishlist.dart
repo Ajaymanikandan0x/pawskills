@@ -150,26 +150,51 @@ class UserWishlist extends StatelessWidget {
 
   void _syncWithHive(List<DocumentSnapshot> wishlist) async {
     final Box wishListBox = await Hive.openBox('wishlist');
-    for (final item in wishlist) {
-      final petData = item.data() as Map<String, dynamic>;
-      final petName = petData['petName'] as String;
-      final img = petData['listPhoto'] as String;
-      final energyLevel = petData['energyLevel'] as String;
-      final petdetails = petData['petDetails'] as String;
-      final lifeExpectancy = petData['life_expectancy'] as String;
-      final detailsPhoto = petData['detailsPhoto'] as String;
 
-      // Check if the item exists in Hive, if not, add it
-      if (!wishListBox.values.any((element) => element['petName'] == petName)) {
-        final Map<String, dynamic> petMap = {
-          'petName': petName,
-          'listPhoto': img,
-          'energyLevel': energyLevel,
-          'petDetails': petdetails,
-          'life_expectancy': lifeExpectancy,
-          'detailsPhoto': detailsPhoto,
-        };
-        wishListBox.add(petMap);
+    for (final item in wishlist) {
+      final petData = item.data();
+
+      if (petData is Map<dynamic, dynamic>) {
+        final petName = petData['petName'] as String?;
+
+        if (petName != null) {
+          final existingPet = wishListBox.values.firstWhere(
+              (element) => element['petName'] == petName,
+              orElse: () => null);
+
+          if (existingPet == null) {
+            // Pet is not in the wishlist, add it
+            final img = petData['listPhoto'] as String?;
+            final energyLevel = petData['energyLevel'] as String?;
+            final petdetails = petData['petDetails'] as String?;
+            final lifeExpectancy = petData['life_expectancy'] as String?;
+            final detailsPhoto = petData['detailsPhoto'] as String?;
+
+            if (img != null &&
+                energyLevel != null &&
+                petdetails != null &&
+                lifeExpectancy != null &&
+                detailsPhoto != null) {
+              final Map<String, dynamic> petMap = {
+                'petName': petName,
+                'listPhoto': img,
+                'energyLevel': energyLevel,
+                'petDetails': petdetails,
+                'life_expectancy': lifeExpectancy,
+                'detailsPhoto': detailsPhoto,
+              };
+              wishListBox.add(petMap);
+            } else {
+              print('Error: Missing data for pet $petName.');
+            }
+          } else {
+            print('Pet $petName is already in the wishlist.');
+          }
+        } else {
+          print('Error: Missing petName for a pet.');
+        }
+      } else {
+        print('Error: pet data is not in the expected format');
       }
     }
   }

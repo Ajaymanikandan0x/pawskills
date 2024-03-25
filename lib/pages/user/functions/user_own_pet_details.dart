@@ -1,4 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +7,7 @@ import 'package:pawskills/pages/login/functions/Functions.dart';
 import 'package:pawskills/pages/user/functions/main_functios_user.dart';
 import 'package:pawskills/pages/user/user_training/training_home.dart';
 
-class UserPetInfo extends StatefulWidget {
+class UserOwnPetInfo extends StatefulWidget {
   final String imgBase64;
   final String detailImage;
   final String energyLevel;
@@ -14,7 +15,7 @@ class UserPetInfo extends StatefulWidget {
   final String petDetails;
   final String lifeExpectancy;
 
-  const UserPetInfo({
+  const UserOwnPetInfo({
     Key? key,
     required this.detailImage,
     required this.imgBase64,
@@ -25,10 +26,10 @@ class UserPetInfo extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _UserPetInfoState createState() => _UserPetInfoState();
+  _UserOwnPetInfoState createState() => _UserOwnPetInfoState();
 }
 
-class _UserPetInfoState extends State<UserPetInfo> {
+class _UserOwnPetInfoState extends State<UserOwnPetInfo> {
   bool isWished = false;
 
   @override
@@ -39,6 +40,13 @@ class _UserPetInfoState extends State<UserPetInfo> {
 
   @override
   Widget build(BuildContext context) {
+    Uint8List? img;
+    try {
+      img = base64Decode(widget.detailImage);
+    } catch (e) {
+      print('Error decoding image: $e');
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -53,11 +61,8 @@ class _UserPetInfoState extends State<UserPetInfo> {
                   height: 300,
                   child: AspectRatio(
                     aspectRatio: 16 / 13, // Maintain image aspect ratio
-                    child: widget.detailImage.isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: widget.detailImage,
-                            fit: BoxFit.cover,
-                          )
+                    child: img != null
+                        ? Image.memory(img, fit: BoxFit.cover)
                         : const Placeholder(),
                   ),
                 ),

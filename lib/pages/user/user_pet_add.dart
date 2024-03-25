@@ -198,7 +198,8 @@ class _UserPetState extends State<UserPet> {
       print('Error saving pet details: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('An error occurred. Please try again later.'),
+          content: Text(
+              'An error ocuser_profile_datacurred. Please try again later.'),
         ),
       );
     }
@@ -212,6 +213,7 @@ class _UserPetState extends State<UserPet> {
       print('User is not authenticated.');
       throw Exception('User is not authenticated.');
     }
+
     final databaseRef = FirebaseFirestore.instance;
     final userId = user.uid;
     final userPetsCollectionRef = databaseRef
@@ -232,9 +234,20 @@ class _UserPetState extends State<UserPet> {
       'listPhoto': listPhotoBase64,
       'detailsPhoto': detailsPhotoBase64,
     };
-    final docRef = await userPetsCollectionRef.add(petData);
-    final petId = docRef.id;
-    await docRef.update({'petName': petId});
+
+    // Use petName as the document ID
+    final petName = petNameController.text;
+    final docRef = userPetsCollectionRef.doc(petName);
+
+    // Check if pet already exists
+    final docSnapshot = await docRef.get();
+    if (docSnapshot.exists) {
+      // Pet with the same name already exists, update its details
+      await docRef.update(petData);
+    } else {
+      // Pet does not exist, add it to the collection
+      await docRef.set(petData);
+    }
   }
 
   // Function to save pet data into Hive
@@ -249,7 +262,6 @@ class _UserPetState extends State<UserPet> {
       Hive.registerAdapter(PetDataAdapter());
     }
 
-    // Open a Hive box
     final box = await Hive.openBox<PetData>('user_pets');
 
     // Create a new PetData object

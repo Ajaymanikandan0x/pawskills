@@ -56,8 +56,11 @@ class _AddBewPetState extends State<AddNewPet> {
     if (widget.lifeExpectancy != null) {
       temperamentController.text = widget.lifeExpectancy!;
     }
-    if (widget.selectedEnergyLevel != null) {
+    if (widget.selectedEnergyLevel != null &&
+        ['High', 'Medium', 'Low'].contains(widget.selectedEnergyLevel!)) {
       selectedEnergyLevel = widget.selectedEnergyLevel!;
+    } else {
+      selectedEnergyLevel = 'High';
     }
     if (widget.avgweight != null) {
       avgWeightController.text = widget.avgweight!;
@@ -149,11 +152,9 @@ class _AddBewPetState extends State<AddNewPet> {
                             value: value,
                             child: Text(
                               value,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 22,
-                                color: value == 'Select'
-                                    ? Colors.grey
-                                    : Colors.black,
+                                color: Colors.black,
                               ),
                             ),
                           );
@@ -240,6 +241,17 @@ class _AddBewPetState extends State<AddNewPet> {
   // ____________________________save_Firebase__________________________________
 
   Future<void> _uploadPetDetailsToFirebase() async {
+    if (listPhoto == null ||
+        detailsPhoto == null ||
+        listPhoto!.isEmpty ||
+        detailsPhoto!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select both list photo and details photo.'),
+        ),
+      );
+      return;
+    }
     final databaseRef = FirebaseFirestore.instance;
     final dogCollectionRef = databaseRef.collection('categories').doc('Dog');
     final petsCollectionRef = dogCollectionRef.collection('List');
@@ -252,8 +264,8 @@ class _AddBewPetState extends State<AddNewPet> {
       'weight': avgWeightController.text,
       'height': avgHeightController.text,
       'energyLevel': selectedEnergyLevel,
-      'listPhoto': listPhoto, // Store both image base64 strings
-      'detailsPhoto': detailsPhoto, // Store image as base64 string
+      'listPhoto': listPhoto,
+      'detailsPhoto': detailsPhoto,
     };
 
     try {

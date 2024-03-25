@@ -296,15 +296,7 @@ class _NewWorkoutState extends State<NewWorkout> {
     String time = timeController.text;
     String? imgPath = _selectedImage;
     String? category = selectedCategory;
-    String? selectedList = dropdownValues.first.toString();
-
-    // Use the selected dropdown value as the document ID
-    String selectedValue =
-        dropdownValues.isNotEmpty ? dropdownValues.first : '';
-    if (selectedValue.isEmpty) {
-      print('No selected category.');
-      return;
-    }
+    String? selectedList = selectedValue;
 
     // Save data to Firestore
     final databaseRef = FirebaseFirestore.instance;
@@ -312,7 +304,7 @@ class _NewWorkoutState extends State<NewWorkout> {
         .collection('WorkoutList')
         .doc(selectedCategory)
         .collection('List')
-        .doc(selectedValue);
+        .doc(selectedList);
     final workoutCollection =
         workoutCollectionRef.collection('subList').doc(workoutName);
 
