@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pawskills/pages/user/uder_profile.dart';
+import 'package:pawskills/pages/user/user_profile.dart';
 import 'package:pawskills/pages/user/user_home.dart';
 import 'package:pawskills/pages/user/user_wishlist.dart';
 
@@ -18,43 +18,46 @@ class _UserNavbarState extends State<UserNavbar> {
     return Scaffold(
       body: _buildBody(),
       bottomNavigationBar: BottomAppBar(
-        child: SafeArea(
-          child: SizedBox(
-            height: kToolbarHeight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TabButton(
-                  icon: Icons.home,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 0;
-                    });
-                  },
-                  isSelected: selectTab == 0,
-                ),
-                TabButton(
-                  icon: Icons.favorite_border_outlined,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 1;
-                    });
-                  },
-                  isSelected: selectTab == 1,
-                ),
-                TabButton(
-                  icon: Icons.person,
-                  onTap: () {
-                    setState(() {
-                      selectTab = 2;
-                    });
-                  },
-                  isSelected: selectTab == 2,
-                ),
-              ],
-            ),
+        elevation: 8, // Add elevation for a shadow effect
+        child: SizedBox(
+          height: kToolbarHeight + 30, // Increase height for better touch area
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildTab(Icons.home, "Home", 0),
+              _buildTab(Icons.favorite_border_outlined, "Wishlist", 1),
+              _buildTab(Icons.person, "Profile", 2),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTab(IconData icon, String label, int index) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          selectTab = index;
+        });
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: selectTab == index ? Colors.blue : Colors.grey,
+            size: 25,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: selectTab == index ? Colors.blue : Colors.grey,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -68,47 +71,7 @@ class _UserNavbarState extends State<UserNavbar> {
       case 2:
         return const UserProfile();
       default:
-        return const SizedBox(); // Handle any other case
+        return const SizedBox(); // in case off error
     }
-  }
-}
-
-class TabButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool isSelected;
-
-  const TabButton({
-    required this.icon,
-    required this.onTap,
-    required this.isSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? Colors.blue : Colors.grey,
-            size: 25,
-          ),
-          SizedBox(
-            height: isSelected ? 8 : 2,
-          ),
-          if (isSelected)
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.red, Colors.blue]),
-              ),
-              height: 4,
-              width: 4,
-            )
-        ],
-      ),
-    );
   }
 }

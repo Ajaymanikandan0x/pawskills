@@ -84,6 +84,9 @@ class PetData {
   @HiveField(7)
   String? detailsPhotoBase64;
 
+  @HiveField(8)
+  late List<Map<String, String>> vaccinations;
+
   PetData({
     required this.petName,
     required this.petDetails,
@@ -93,6 +96,7 @@ class PetData {
     required this.energyLevel,
     this.listPhotoBase64,
     this.detailsPhotoBase64,
+    required this.vaccinations,
   });
 }
 

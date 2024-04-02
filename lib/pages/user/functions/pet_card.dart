@@ -39,83 +39,101 @@ class _PetCardState extends State<PetCard> {
 
   @override
   Widget build(BuildContext context) {
-    String listimg = widget.listImg;
+    String listImg = widget.listImg;
     return InkWell(
-      onTap: () {
-        if (widget.onTap != null) {
-          widget.onTap!();
-        }
-      },
-      child: Card(
-        color: Colors.white,
-        elevation: 10,
-        shadowColor: Colors.grey,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 8, left: 8, bottom: 8, right: 8),
-              child: SizedBox(
-                height: 110,
-                width: 110,
-                child: listimg.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: listimg,
-                        fit: BoxFit.cover,
-                      )
-                    : const Placeholder(),
+        onTap: () {
+          if (widget.onTap != null) {
+            widget.onTap!();
+          }
+        },
+        child: Card(
+          elevation: 5,
+          shadowColor: Colors.grey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12), // Apply border radius
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.white, Colors.grey[200]!], // Apply gradient
               ),
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.petName,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600),
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: SizedBox(
+                    height: 110,
+                    width: 110,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: listImg.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: listImg,
+                              fit: BoxFit.cover,
+                            )
+                          : const Placeholder(),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      widget.energyLevel,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 8),
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: SingleChildScrollView(
-                        child: Text(
-                          widget.petdetails,
-                          maxLines: 2,
-                          style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.petName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87, // Adjust text color
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.energyLevel,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54, // Adjust text color
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Flexible(
+                        child: SingleChildScrollView(
+                          child: Text(
+                            widget.petdetails,
+                            maxLines: 2,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87, // Adjust text color
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: wishButton(
+                    isWished: isWished,
+                    onTap: () {
+                      setState(() {
+                        isWished = isWished;
+                      });
+                      _toggleWishlist(widget.petName);
+                    },
+                  ),
+                )
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: wishButton(
-                isWished: isWished,
-                onTap: () {
-                  setState(() {
-                    isWished = isWished;
-                  });
-                  _toggleWishlist(widget.petName);
-                },
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   void _toggleWishlist(String petName) async {

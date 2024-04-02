@@ -1,9 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:pawskills/pages/login/functions/Functions.dart';
-import 'package:pawskills/pages/user/functions/main_functios_user.dart';
 import 'package:pawskills/pages/user/user_training/training_home.dart';
 
 class UserPetInfo extends StatefulWidget {
@@ -12,7 +11,8 @@ class UserPetInfo extends StatefulWidget {
   final String energyLevel;
   final String petName;
   final String petDetails;
-  final String lifeExpectancy;
+  final String gender;
+  final List<dynamic>? vaccinations;
 
   const UserPetInfo({
     Key? key,
@@ -21,7 +21,8 @@ class UserPetInfo extends StatefulWidget {
     required this.petName,
     required this.energyLevel,
     required this.petDetails,
-    required this.lifeExpectancy,
+    required this.gender,
+    this.vaccinations,
   }) : super(key: key);
 
   @override
@@ -29,134 +30,101 @@ class UserPetInfo extends StatefulWidget {
 }
 
 class _UserPetInfoState extends State<UserPetInfo> {
-  bool isWished = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkWishlist();
-  }
-
   @override
   Widget build(BuildContext context) {
-    String detailImage = widget.detailImage;
+    print(widget.vaccinations);
+    Uint8List? img;
+    try {
+      img = base64Decode(widget.detailImage);
+    } catch (e) {
+      print('Error decoding image: $e');
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              // Align content to edges
               children: [
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 300,
-                  child: AspectRatio(
-                    aspectRatio: 16 / 13, // Maintain image aspect ratio
-                    child: detailImage.isNotEmpty
-                        ? CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            imageUrl: detailImage,
-                          )
+                AspectRatio(
+                  aspectRatio: 16 / 13,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: img != null
+                        ? Image.memory(img, fit: BoxFit.cover)
                         : const Placeholder(),
                   ),
                 ),
                 const SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(
-                    widget.petName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 29,
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Center(
+                    child: Text(
+                      widget.petName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: bell(
-                          icon: Icons.upgrade_outlined,
-                          width: 45,
-                          height: 45,
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildInfoItem(Icons.upgrade_outlined, widget.energyLevel),
+                    _buildInfoItem(Icons.pets, widget.gender),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 50),
+                      child: Icon(MdiIcons.needle),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        showVaccinationDialog(widget.vaccinations);
+                      },
+                      child: Text(
+                        'Vaccination',
+                        style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        flex: 2,
-                        child: Text(
-                          widget.energyLevel,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        flex: 1,
-                        child: bell(
-                          icon: Icons.timelapse,
-                          height: 45,
-                          width: 45,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        flex: 2,
-                        child: Text(
-                          widget.lifeExpectancy,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        flex: 1,
-                        child: wishButton(
-                          isWished: isWished,
-                          onTap: () {
-                            _toggleWishlist();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     widget.petDetails,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w400, fontSize: 18),
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 18,
+                      color: Colors.grey[800],
+                    ),
                     maxLines: null,
                     softWrap: true,
                   ),
                 ),
                 const SizedBox(height: 20),
                 button(
-                    text: 'Training',
-                    ontap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserWorkoutList(
-                              energyLevel: widget.energyLevel,
-                            ),
-                          ));
-                    },
-                    width: 350)
+                  text: 'Training',
+                  ontap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserWorkoutList(
+                          energyLevel: widget.energyLevel,
+                        ),
+                      ),
+                    );
+                  },
+                  width: double.infinity,
+                ),
               ],
             ),
           ),
@@ -165,51 +133,80 @@ class _UserPetInfoState extends State<UserPetInfo> {
     );
   }
 
-  void _toggleWishlist() async {
-    try {
-      final userId = FirebaseAuth.instance.currentUser!.uid;
-      final wishlistRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('wishlist');
+  Widget _buildInfoItem(IconData icon, String text) {
+    final iconSize =
+        MediaQuery.of(context).size.width * 0.05; // Adjust the factor as needed
+    final textSize = MediaQuery.of(context).size.width * 0.04;
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: iconSize,
+          color: Colors.grey[700],
+        ),
+        const SizedBox(width: 10),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: textSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[700],
+          ),
+        ),
+      ],
+    );
+  }
 
-      if (isWished) {
-        await wishlistRef.doc(widget.petName).delete();
-      } else {
-        // Save all pet data to the wishlist
-        await wishlistRef.doc(widget.petName).set({
-          'petName': widget.petName,
-          'energyLevel': widget.energyLevel,
-          'petDetails': widget.petDetails,
-          'lifeExpectancy': widget.lifeExpectancy,
-          'detailsPhoto': widget.detailImage,
-          'listPhoto': widget.imgBase64
-        });
-      }
-
-      setState(() {
-        isWished = !isWished;
-      });
-    } catch (e) {
-      print('Error toggling wishlist: $e');
+  void showVaccinationDialog(List<dynamic>? vaccinations) {
+    if (vaccinations == null || vaccinations.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Vaccination Data', style: _style),
+            content: Text(
+              'No vaccination data available.',
+              style: _style,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Vaccination Details'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: vaccinations.map((vaccine) {
+                return Text('${vaccine['name']}: ${vaccine['timePeriod']}',
+                    style: _style);
+              }).toList(),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
-  Future<void> _checkWishlist() async {
-    try {
-      final userId = FirebaseAuth.instance.currentUser!.uid;
-      final wishlistDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('wishlist')
-          .doc(widget.petName)
-          .get();
-
-      setState(() {
-        isWished = wishlistDoc.exists;
-      });
-    } catch (e) {
-      print('Error checking wishlist: $e');
-    }
-  }
+  final TextStyle _style = TextStyle(
+      fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[700]);
 }

@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:pawskills/pages/user/functions/main_functios_user.dart';
 
 // __________________________workout_sublist____________________________________
 
@@ -8,134 +7,179 @@ Widget userWorkoutSubCard({
   required String? workoutImageUrl,
   required String workoutName,
   required String workoutTime,
-  required void Function()? ontap,
+  required void Function()? onTap,
   required BuildContext context,
 }) {
   return InkWell(
-    onTap: ontap,
+    onTap: onTap,
     child: Card(
       color: Colors.white,
-      elevation: 10,
-      shadowColor: Colors.grey,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: 70,
-              width: 70,
-              child: workoutImageUrl != null
-                  ? Image.network(
-                      workoutImageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Placeholder(),
-                    )
-                  : const Placeholder(),
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                  width: 1.0,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.0),
+                child: workoutImageUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: workoutImageUrl,
+                        fit: BoxFit.cover,
+                      )
+                    : const Placeholder(
+                        fallbackHeight: 80,
+                        fallbackWidth: 80,
+                      ),
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+            const SizedBox(width: 16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     workoutName,
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w500),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    workoutTime,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                  )
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        size: 18,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Time: $workoutTime min',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );
 }
 
 // ______________________________workout_card___________________________________
+
 Widget userWorkoutCard({
   String? categoryImg,
   required String categoryName,
   required String workoutList,
   required String workoutTime,
-  required void Function()? ontap,
+  required void Function()? onTap,
   required BuildContext context,
   required void Function()? wishList,
   required bool isWished,
 }) {
   return InkWell(
-    onTap: ontap,
+    onTap: onTap,
     child: Card(
       color: Colors.white,
-      elevation: 10,
-      shadowColor: Colors.grey,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: 70,
-              width: 70,
-              child: categoryImg != null
-                  ? CachedNetworkImage(
-                      imageUrl: categoryImg,
-                      fit: BoxFit.cover,
-                    )
-                  : const Placeholder(),
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.0),
+              child: SizedBox(
+                height: 80,
+                width: 80,
+                child: categoryImg != null
+                    ? CachedNetworkImage(
+                        imageUrl: categoryImg,
+                        fit: BoxFit.cover,
+                      )
+                    : const Placeholder(
+                        fallbackHeight: 80,
+                        fallbackWidth: 80,
+                      ),
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+            const SizedBox(width: 16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     categoryName,
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w500),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                        workoutList,
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.grey),
+                      const Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: Colors.grey,
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 4),
                       Text(
-                        workoutTime,
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.grey),
+                        'Time: $workoutTime min',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
-                  )
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'List: $workoutList',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 10),
-            child: wishButton(isWished: isWished, onTap: wishList),
-          ),
-        ],
+            IconButton(
+              icon: Icon(
+                isWished ? Icons.favorite : Icons.favorite_border,
+                color: isWished ? Colors.red : Colors.grey,
+              ),
+              onPressed: wishList,
+            ),
+          ],
+        ),
       ),
     ),
   );

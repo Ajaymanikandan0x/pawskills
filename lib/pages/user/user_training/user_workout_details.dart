@@ -46,11 +46,11 @@ class _UserWorkoutDetailsState extends State<UserWorkoutDetails> {
       appBar: AppBar(
         title: const Text(
           'Exercise Details',
-          style: TextStyle(color: Colors.black87),
+          style: TextStyle(color: Colors.black87, fontSize: 18),
         ),
         centerTitle: true,
         backgroundColor: Colors.grey[200],
-        elevation: 1,
+        elevation: 4,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -60,17 +60,19 @@ class _UserWorkoutDetailsState extends State<UserWorkoutDetails> {
             CachedNetworkImage(
               imageUrl: widget.imgUrl,
               fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  Lottie.asset('assets/json/loading.json'),
+              placeholder: (context, url) => Lottie.asset(
+                'assets/json/loading.json',
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
               errorWidget: (context, url, error) => const Icon(Icons.error),
-              height: 200,
-              width: double.infinity,
             ),
             const SizedBox(height: 20),
             Text(
               widget.workoutName,
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
               ),
@@ -85,6 +87,7 @@ class _UserWorkoutDetailsState extends State<UserWorkoutDetails> {
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
                     letterSpacing: 1,
+                    height: 1.4,
                   ),
                   textAlign: TextAlign.justify,
                 ),
@@ -99,7 +102,7 @@ class _UserWorkoutDetailsState extends State<UserWorkoutDetails> {
                   width: 150,
                   child: CircularProgressIndicator(
                     value: secondsRemaining / initialSeconds,
-                    strokeWidth: 10,
+                    strokeWidth: 8,
                     valueColor:
                         const AlwaysStoppedAnimation<Color>(Colors.black),
                     backgroundColor: Colors.grey[300],

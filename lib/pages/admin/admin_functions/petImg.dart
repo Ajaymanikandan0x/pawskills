@@ -57,14 +57,15 @@ Widget nameField(
         {String? hintText,
         TextEditingController? controller,
         String? Function(String?)? validate,
-        int? maxLines = 1}) =>
+        int? maxLines = 1,
+        Function(dynamic value)? onChanged}) =>
     TextFormField(
       maxLines: maxLines,
       style: const TextStyle(fontSize: 20),
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.only(left: 20, top: 15, bottom: 15),
         filled: true,
-        fillColor: const Color(0xffC9C0C0),
+        fillColor: Colors.white,
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
           borderSide: const BorderSide(

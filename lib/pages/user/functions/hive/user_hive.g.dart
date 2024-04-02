@@ -117,13 +117,16 @@ class PetDataAdapter extends TypeAdapter<PetData> {
       energyLevel: fields[5] as String,
       listPhotoBase64: fields[6] as String?,
       detailsPhotoBase64: fields[7] as String?,
+      vaccinations: (fields[8] as List)
+          .map((dynamic e) => (e as Map).cast<String, String>())
+          .toList(),
     );
   }
 
   @override
   void write(BinaryWriter writer, PetData obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.petName)
       ..writeByte(1)
@@ -139,7 +142,9 @@ class PetDataAdapter extends TypeAdapter<PetData> {
       ..writeByte(6)
       ..write(obj.listPhotoBase64)
       ..writeByte(7)
-      ..write(obj.detailsPhotoBase64);
+      ..write(obj.detailsPhotoBase64)
+      ..writeByte(8)
+      ..write(obj.vaccinations);
   }
 
   @override

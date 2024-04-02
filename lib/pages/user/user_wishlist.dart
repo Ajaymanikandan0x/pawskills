@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 import 'package:pawskills/pages/user/usr_pet_info.dart';
-
+import 'functions/home_pet_details.dart';
 import 'functions/pet_card.dart';
 import 'functions/trainig/user_saved_pets.dart';
 
@@ -15,7 +17,7 @@ class UserWishlist extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.grey[200],
+        backgroundColor: Colors.blueAccent,
         centerTitle: true,
         title: const Text(
           'Wishlist',
@@ -30,10 +32,16 @@ class UserWishlist extends StatelessWidget {
           }
           if (snapshot.hasData && snapshot.data!) {
             // Network is available, show Firebase data
-            return _firebaseWishList();
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: _firebaseWishList(),
+            );
           } else {
             // Network is not available, show Hive data
-            return _hiveWishlist();
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              child: _hiveWishlist(),
+            );
           }
         },
       ),
@@ -76,7 +84,7 @@ class UserWishlist extends StatelessWidget {
               petdetails: petdetails,
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => UserPetInfo(
+                  builder: (context) => HomePetDetails(
                     imgBase64: img,
                     detailImage: detailsPhoto,
                     petName: petname,
@@ -106,35 +114,38 @@ class UserWishlist extends StatelessWidget {
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
-        final Box wishListBox = snapshot.data!;
-        if (wishListBox.isEmpty) {
+        final Box? wishListBox = snapshot.data;
+        if (wishListBox == null || wishListBox.isEmpty) {
           return const Center(child: Text('No data available'));
         }
         return ListView.separated(
           itemCount: wishListBox.length,
           itemBuilder: (context, index) {
-            final petData = wishListBox.getAt(index) as Map<String, dynamic>;
+            final petData = wishListBox.getAt(index) as Map?;
+            if (petData == null) {
+              return const SizedBox();
+            }
             final img = petData['listPhoto'];
-            final petname = petData['petName'];
+            final petName = petData['petName'];
             final energyLevel = petData['energyLevel'];
-            final petdetails = petData['petDetails'];
+            final petDetails = petData['petDetails'];
             final lifeExpectancy = petData['life_expectancy'];
             final detailsPhoto = petData['detailsPhoto'];
 
             return PetCard(
               listImg: img,
-              petName: petname,
+              petName: petName,
               energyLevel: energyLevel,
-              petdetails: petdetails,
+              petdetails: petDetails,
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => UserPetInfo(
                     imgBase64: img,
                     detailImage: detailsPhoto,
-                    petName: petname,
+                    petName: petName,
                     energyLevel: energyLevel,
-                    petDetails: petdetails,
-                    lifeExpectancy: lifeExpectancy,
+                    petDetails: petDetails,
+                    gender: lifeExpectancy,
                   ),
                 ));
               },
@@ -155,21 +166,28 @@ class UserWishlist extends StatelessWidget {
       final petName = petData['petName'] as String;
       final img = petData['listPhoto'] as String;
       final energyLevel = petData['energyLevel'] as String;
-      final petdetails = petData['petDetails'] as String;
+      final petDetails = petData['petDetails'] as String;
       final lifeExpectancy = petData['life_expectancy'] as String;
       final detailsPhoto = petData['detailsPhoto'] as String;
 
       // Check if the item exists in Hive, if not, add it
       if (!wishListBox.values.any((element) => element['petName'] == petName)) {
-        final Map<String, dynamic> petMap = {
-          'petName': petName,
-          'listPhoto': img,
-          'energyLevel': energyLevel,
-          'petDetails': petdetails,
-          'life_expectancy': lifeExpectancy,
-          'detailsPhoto': detailsPhoto,
-        };
-        wishListBox.add(petMap);
+        final http.Response response = await http.get(Uri.parse(detailsPhoto));
+        if (response.statusCode == 200) {
+          final String base64Image = base64Encode(response.bodyBytes);
+          print('----------------------------- $base64Image');
+          final Map<String, dynamic> petMap = {
+            'petName': petName,
+            'listPhoto': img,
+            'energyLevel': energyLevel,
+            'petDetails': petDetails,
+            'life_expectancy': lifeExpectancy,
+            'detailsPhoto': base64Image, // Save image as base64 string
+          };
+          wishListBox.add(petMap);
+        } else {
+          print('Failed to fetch detailed image for $petName');
+        }
       }
     }
   }

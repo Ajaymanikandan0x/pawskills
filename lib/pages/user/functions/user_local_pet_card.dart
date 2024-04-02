@@ -50,18 +50,24 @@ class _LocalPetCardState extends State<LocalPetCard> {
         color: Colors.white,
         elevation: 10,
         shadowColor: Colors.grey,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // Add border radius
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.only(top: 8, left: 8, bottom: 8, right: 8),
+              padding: const EdgeInsets.all(8.0),
               child: SizedBox(
-                height: 110,
-                width: 110,
-                child: img != null
-                    ? Image.memory(img, fit: BoxFit.cover)
-                    : const Placeholder(),
+                height: 100, // Adjust image size
+                width: 100, // Adjust image size
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  // Add border radius to image
+                  child: img != null
+                      ? Image.memory(img, fit: BoxFit.cover)
+                      : const Placeholder(),
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -75,12 +81,14 @@ class _LocalPetCardState extends State<LocalPetCard> {
                     Text(
                       widget.petName,
                       style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4), // Adjust spacing
                     Text(
                       widget.energyLevel,
-                      style: const TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                     const SizedBox(height: 8),
                     Flexible(
@@ -89,7 +97,8 @@ class _LocalPetCardState extends State<LocalPetCard> {
                         child: Text(
                           widget.petdetails,
                           maxLines: 2,
-                          style: const TextStyle(fontSize: 16),
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       ),
                     ),
