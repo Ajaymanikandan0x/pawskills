@@ -165,7 +165,7 @@ void _navigateToCategory(BuildContext context, String categoryName) {
 Widget editButton(
         {double height = 30,
         double? width = 30,
-        double icon_size = 10,
+        double icon_size = 20,
         void Function()? ontap}) =>
     InkWell(
       onTap: ontap,

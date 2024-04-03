@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pawskills/pages/user/functions/pet_card.dart';
 
-import '../usr_pet_info.dart';
+import 'home_pet_details.dart';
 
 class UserPetView extends StatefulWidget {
   const UserPetView({super.key});
@@ -51,7 +51,7 @@ class _UserPetViewState extends State<UserPetView> {
                 life_expectancy: lifeExpectancy,
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => UserPetInfo(
+                      builder: (context) => HomePetDetails(
                           imgBase64: img,
                           detailImage: detailsPhoto,
                           petName: petname,

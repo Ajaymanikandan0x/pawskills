@@ -45,7 +45,7 @@ void main() async {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           textTheme: GoogleFonts.poppinsTextTheme(),
-          scaffoldBackgroundColor: const Color(0xFFE5E5E5)),
+          scaffoldBackgroundColor: Colors.grey[200]),
       routes: {
         '/': (context) => const SplashScreen(),
         '/root': (context) => const Root(),

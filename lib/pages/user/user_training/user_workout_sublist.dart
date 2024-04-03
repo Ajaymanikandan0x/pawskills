@@ -57,7 +57,7 @@ class UserWorkoutSubList extends StatelessWidget {
                   workoutImageUrl: img,
                   workoutName: subWorkoutName,
                   workoutTime: workoutTime,
-                  ontap: () {
+                  onTap: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(

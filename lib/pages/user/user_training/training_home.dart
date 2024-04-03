@@ -84,7 +84,7 @@ class _UserWorkoutListState extends State<UserWorkoutList> {
                         categoryImg: listPhoto ?? '',
                         workoutList: workoutList ?? '',
                         workoutTime: workoutTime ?? '',
-                        ontap: () {
+                        onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(

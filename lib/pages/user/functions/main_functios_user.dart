@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pawskills/pages/user/functions/settings.dart';
 
 // __________________________________Home_____________________________________________
 Widget bell(
@@ -103,3 +104,54 @@ Widget usrPetImg({
               ),
       ),
     );
+// ______________________________settings_List__________________________________
+
+Widget buildDrawer(BuildContext context) {
+  return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+          ),
+          child: const Text(
+            'Settings',
+            style: TextStyle(
+              fontSize: 24,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.exit_to_app),
+          title: const Text('Logout'),
+          onTap: () {
+            AppSettings.kickOut(context); // Call signOut method
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.privacy_tip),
+          title: const Text('Privacy Policy'),
+          onTap: () {
+            AppSettings.openPrivacyPolicy(context);
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.contact_page),
+          title: const Text('Contact'),
+          onTap: () {
+            AppSettings.openContact(context); // Call openContact method
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.support_agent),
+          title: const Text('Support'),
+          onTap: () {
+            AppSettings.openSupport(context); // Call openSupport method
+          },
+        ),
+      ],
+    ),
+  );
+}

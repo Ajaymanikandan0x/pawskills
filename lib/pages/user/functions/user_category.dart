@@ -3,81 +3,79 @@ import 'package:flutter/material.dart';
 
 // _________________________homepage_category___________________________________
 
-Widget userHomePageCategory({required String text, void Function()? ontap}) =>
+Widget userHomePageCategory({required String text, void Function()? onTap}) =>
     InkWell(
       borderRadius: BorderRadius.circular(25),
-      onTap: ontap,
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.blueAccent, Colors.lightBlueAccent],
+          ),
           borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withOpacity(0.3),
               spreadRadius: 2,
-              blurRadius: 3,
+              blurRadius: 5,
               offset: const Offset(0, 3), // changes position of shadow
             ),
           ],
         ),
         height: 40,
-        width: text.length * 18.0,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Center(
-            child: Text(
-          text,
-          style: TextStyle(
-              fontSize: 18,
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[600]),
-        )),
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
 
 // ______________________category_list_view_____________________________________
 
-Widget userCategoryList(BuildContext context) => Row(
-      children: [
-        Expanded(
-          child: SizedBox(
-            height: 40,
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('categories').where(
-                  'categoryName',
-                  whereIn: ['Others', 'Add-Pet', 'Cat', 'Dog']).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+Widget userCategoryList(BuildContext context) => SizedBox(
+      height: 40,
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('categories').where(
+            'categoryName',
+            whereIn: ['Others', 'Add-Pet', 'Cat', 'Dog']).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
 
-                final List<DocumentSnapshot> documents = snapshot.data!.docs;
+          final List<DocumentSnapshot> documents = snapshot.data!.docs;
 
-                return ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: documents.length,
-                  itemBuilder: (context, index) {
-                    final category =
-                        documents[index].data() as Map<String, dynamic>;
-                    final categoryName = category['categoryName'];
-                    return userHomePageCategory(
-                        text: '$categoryName',
-                        ontap: () {
-                          _userNavigateToCategory(context, categoryName);
-                        });
-                  },
-                  separatorBuilder: (BuildContext context, int index) =>
-                      const SizedBox(
-                    width: 8.0,
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
+          return ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: documents.length,
+            itemBuilder: (context, index) {
+              final category = documents[index].data() as Map<String, dynamic>;
+              final categoryName = category['categoryName'];
+              return userHomePageCategory(
+                text: '$categoryName',
+                onTap: () {
+                  _userNavigateToCategory(context, categoryName);
+                },
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) =>
+                const SizedBox(width: 8.0),
+          );
+        },
+      ),
     );
 
 void _userNavigateToCategory(BuildContext context, String categoryName) {

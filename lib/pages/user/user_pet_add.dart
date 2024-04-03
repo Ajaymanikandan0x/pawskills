@@ -23,16 +23,20 @@ class UserPet extends StatefulWidget {
 class _UserPetState extends State<UserPet> {
   final petNameController = TextEditingController();
   final petDetailsController = TextEditingController();
-  final genderController = TextEditingController();
   final weightController = TextEditingController();
   final heightController = TextEditingController();
-  final energyLevelController = TextEditingController();
+  final List<TextEditingController> vaccineNameControllerList = [];
+  final List<TextEditingController> vaccineTimeControllerList = [];
+
+  final List<Map<String, String>> vaccinations = [];
 
   File? listPhoto;
   File? detailsPhoto;
 
   String? listPhotoBase64;
   String? detailsPhotoBase64;
+  String? selectedEnergyLevel;
+  String? selectGender;
 
   @override
   Widget build(BuildContext context) {
@@ -40,89 +44,230 @@ class _UserPetState extends State<UserPet> {
       appBar: AppBar(
         title: const Text(
           'Add',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
         ),
         centerTitle: true,
-        backgroundColor: Colors.grey[200],
+        backgroundColor: Colors.grey[100],
+        elevation: 0, // Remove appbar shadow
       ),
+      backgroundColor: Colors.grey[100], // Set background color for the body
       body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: [
-                    usrPetImg(
-                        text: 'list-photo',
-                        selectimg: listPhotoBase64,
-                        ontap: () async {
-                          await _getImage(context: context, forListPhoto: true);
-                        }),
-                    const SizedBox(width: 8),
-                    usrPetImg(
-                        text: 'Details-photo',
-                        selectimg: detailsPhotoBase64,
-                        ontap: () async {
-                          await _getImage(
-                              context: context, forListPhoto: false);
-                        })
-                  ],
-                ),
-                const SizedBox(height: 15),
-                _text(
-                  'Name',
-                ),
-                const SizedBox(height: 7),
-                nameField(
-                  hintText: 'Pet name',
-                  controller: petNameController,
-                ),
-                const SizedBox(height: 15),
-                _text(
-                  'Details',
-                ),
-                const SizedBox(height: 10),
-                nameField(
-                    maxLines: null,
-                    controller: petDetailsController,
-                    hintText: 'Details'),
-                const SizedBox(height: 15),
-                _text(
-                  'Complete Profile',
-                ),
-                const SizedBox(height: 25),
-                form_field(
-                    Hint_text: 'Energy Level',
-                    controller: energyLevelController,
-                    inputIcon: const Icon(Icons.upgrade_outlined)),
-                const SizedBox(height: 10),
-                form_field(
-                    Hint_text: 'Gender',
-                    inputIcon: const Icon(Icons.timelapse),
-                    controller: genderController),
-                const SizedBox(height: 10),
-                pet_bmi(
-                    Hint_text: 'AVG Weight',
-                    inputIcon: const Icon(Icons.monitor_weight_outlined),
-                    controller: heightController,
-                    hi_wi: 'KG'),
-                const SizedBox(height: 10),
-                pet_bmi(
-                    Hint_text: 'AVG Height',
-                    inputIcon: const Icon(Icons.height),
-                    controller: weightController,
-                    hi_wi: 'CM'),
-                const SizedBox(height: 20),
-                button(
-                    text: 'Save',
-                    ontap: () async {
-                      await _savePetData();
-                    },
-                    width: 350)
-              ],
+        padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: usrPetImg(
+                      text: 'List Photo',
+                      selectimg: listPhotoBase64,
+                      ontap: () async {
+                        await _getImage(context: context, forListPhoto: true);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // Add some spacing between the widgets
+                  Expanded(
+                    child: usrPetImg(
+                      text: 'Details Photo',
+                      selectimg: detailsPhotoBase64,
+                      ontap: () async {
+                        await _getImage(context: context, forListPhoto: false);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20), // Add spacing between the rows
+              _text('Name'),
+              const SizedBox(height: 7),
+              nameField(
+                hintText: 'Pet Name',
+                controller: petNameController,
+              ),
+              const SizedBox(height: 20),
+              _text('Details'),
+              const SizedBox(height: 10),
+              nameField(
+                maxLines: null,
+                controller: petDetailsController,
+                hintText: 'Details',
+              ),
+              const SizedBox(height: 20),
+              _text('Complete Profile'),
+              const SizedBox(height: 25),
+              _buildDropdownButton(
+                hintText: 'Energy Level',
+                value: selectedEnergyLevel,
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      selectedEnergyLevel = newValue;
+                    });
+                  }
+                },
+                items: ['High', 'Medium', 'Low']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: value == selectedEnergyLevel
+                            ? Colors.black // Change color for selected item
+                            : Colors.grey, // Change color for unselected item
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 10),
+              _buildDropdownButton(
+                hintText: 'Gender',
+                value: selectGender,
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      selectGender = newValue;
+                    });
+                  }
+                },
+                items: ['Male', 'Female']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: value == selectGender
+                            ? Colors.black // Change color for selected item
+                            : Colors.grey, // Change color for unselected item
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+              _text('Vaccinations'),
+
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: vaccinations.length,
+                itemBuilder: (context, index) {
+                  return _buildVaccinationRow(index);
+                },
+              ),
+
+              TextButton(
+                onPressed: _addVaccination,
+                child: const Text('Add Vaccination'),
+              ),
+              const SizedBox(height: 10),
+              pet_bmi(
+                Hint_text: 'AVG Weight',
+                inputIcon: const Icon(Icons.monitor_weight_outlined),
+                controller: heightController,
+                hi_wi: 'KG',
+              ),
+              const SizedBox(height: 10),
+              pet_bmi(
+                Hint_text: 'AVG Height',
+                inputIcon: const Icon(Icons.height),
+                controller: weightController,
+                hi_wi: 'CM',
+              ),
+              const SizedBox(height: 30),
+              button(
+                text: 'Save',
+                ontap: () async {
+                  await _savePetData();
+                },
+                width: MediaQuery.of(context).size.width *
+                    0.8, // Button width set to 80% of screen width
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVaccinationRow(int index) {
+    TextEditingController vaccineNameController =
+        vaccineNameControllerList[index];
+    TextEditingController vaccineTimeController =
+        vaccineTimeControllerList[index];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        nameField(
+          hintText: 'Vaccination Name',
+          controller: vaccineNameController,
+        ),
+        const SizedBox(height: 10),
+        nameField(
+          hintText: 'Time Period',
+          controller: vaccineTimeController,
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  void _addVaccination() {
+    setState(() {
+      vaccinations.add({
+        'name': '', // Initially empty strings
+        'timePeriod': '',
+      });
+      vaccineNameControllerList.add(TextEditingController());
+      vaccineTimeControllerList.add(TextEditingController());
+    });
+  }
+
+  Widget _buildDropdownButton({
+    required String hintText,
+    required String? value,
+    required Function(String?) onChanged,
+    required List<DropdownMenuItem<String>> items,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.grey),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          onChanged: onChanged,
+          items: items,
+          icon: const Icon(Icons.arrow_drop_down),
+          elevation: 8,
+          style: const TextStyle(fontSize: 16, color: Colors.black),
+          isExpanded: true,
+          dropdownColor: Colors.white,
+          hint: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              hintText,
+              style: TextStyle(
+                fontSize: 16,
+                color: value == null ? Colors.grey : Colors.black,
+              ),
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 
@@ -185,11 +330,13 @@ class _UserPetState extends State<UserPet> {
       // Clear form fields
       petNameController.clear();
       petDetailsController.clear();
-      genderController.clear();
       weightController.clear();
       heightController.clear();
-      energyLevelController.clear();
+      vaccinations.clear();
+
       setState(() {
+        selectGender = '';
+        selectedEnergyLevel = '';
         listPhotoBase64 = null;
         detailsPhotoBase64 = null;
       });
@@ -227,12 +374,20 @@ class _UserPetState extends State<UserPet> {
     final petData = {
       'petName': petNameController.text,
       'petDetails': petDetailsController.text,
-      'gender': genderController.text,
+      'gender': selectGender,
       'weight': weightController.text,
       'height': heightController.text,
-      'energyLevel': energyLevelController.text,
+      'energyLevel': selectedEnergyLevel,
       'listPhoto': listPhotoBase64,
       'detailsPhoto': detailsPhotoBase64,
+      'vaccinations': vaccinations.isNotEmpty
+          ? vaccinations.asMap().entries.map((entry) {
+              final index = entry.key;
+              final vaccineName = vaccineNameControllerList[index].text;
+              final vaccineTimePeriod = vaccineTimeControllerList[index].text;
+              return {'name': vaccineName, 'timePeriod': vaccineTimePeriod};
+            }).toList()
+          : null,
     };
 
     // Use petName as the document ID
@@ -248,6 +403,8 @@ class _UserPetState extends State<UserPet> {
       // Pet does not exist, add it to the collection
       await docRef.set(petData);
     }
+
+    await userPetsCollectionRef.doc(petName).set(petData);
   }
 
   // Function to save pet data into Hive
@@ -268,15 +425,22 @@ class _UserPetState extends State<UserPet> {
     final petData = PetData(
       petName: petNameController.text,
       petDetails: petDetailsController.text,
-      gender: genderController.text,
+      gender: selectGender ?? '',
       weight: weightController.text,
       height: heightController.text,
-      energyLevel: energyLevelController.text,
+      energyLevel: selectedEnergyLevel ?? '',
       listPhotoBase64: listPhotoBase64,
       detailsPhotoBase64: detailsPhotoBase64,
+      vaccinations: vaccinations.isNotEmpty
+          ? vaccinations.asMap().entries.map((entry) {
+              final index = entry.key;
+              final vaccineName = vaccineNameControllerList[index].text;
+              final vaccineTimePeriod = vaccineTimeControllerList[index].text;
+              return {'name': vaccineName, 'timePeriod': vaccineTimePeriod};
+            }).toList()
+          : [],
     );
 
-    // Save the pet data into the Hive box
     await box.add(petData);
   }
 }

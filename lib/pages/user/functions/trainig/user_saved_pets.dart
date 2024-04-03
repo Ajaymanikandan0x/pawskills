@@ -65,6 +65,7 @@ Widget _getPetDataFromFirebase() => StreamBuilder<QuerySnapshot>(
             final petdetails = petData['petDetails'];
             final gender = petData['gender'];
             final detailsPhoto = petData['detailsPhoto'];
+            final vaccination = petData['vaccinations'];
             return LocalPetCard(
                 imgBase64: img,
                 petName: petname,
@@ -72,13 +73,15 @@ Widget _getPetDataFromFirebase() => StreamBuilder<QuerySnapshot>(
                 petdetails: petdetails,
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => UserOwnPetInfo(
-                          imgBase64: img,
-                          detailImage: detailsPhoto,
-                          petName: petname,
-                          energyLevel: energyLevel,
-                          petDetails: petdetails,
-                          lifeExpectancy: gender)));
+                    builder: (context) => UserPetInfo(
+                        imgBase64: img,
+                        detailImage: detailsPhoto,
+                        petName: petname,
+                        energyLevel: energyLevel,
+                        petDetails: petdetails,
+                        gender: gender,
+                        vaccinations: vaccination),
+                  ));
                 });
           },
           separatorBuilder: (BuildContext context, int index) => const SizedBox(
@@ -134,7 +137,8 @@ Widget _getPetDataFromLocal() => FutureBuilder<List<PetData>>(
                     petName: petData.petName,
                     energyLevel: petData.energyLevel,
                     petDetails: petData.petDetails,
-                    lifeExpectancy: '',
+                    gender: petData.gender,
+                    vaccinations: petData.vaccinations,
                   ),
                 ));
               },
